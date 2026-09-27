@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>n8n Foundations Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F9FC; --paper:#FFFFFF; --ink:#1B2433; --ink2:#4A5568; --muted:#7A8699;
+  --line:#DCE2EB; --dot:#CBD3DF; --soft:#EEF2F7;
+  --trig:#D98A00; --trig-bg:#FFF4DE;
+  --act:#2F6FDE;  --act-bg:#E7EFFD;
+  --logic:#7A4FD1; --logic-bg:#F0EAFC;
+  --ai:#0E8A7E;   --ai-bg:#E0F4F1;
+  --bad:#C8455E;  --bad-bg:#FCE8EC;
+  --good:#1F8F4E; --good-bg:#E3F5EA;
+  --code-bg:#F1F4F9;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161F; --paper:#171E2A; --ink:#E6EBF2; --ink2:#B4BDCB; --muted:#8792A3;
+    --line:#2A3445; --dot:#2C3647; --soft:#1D2533;
+    --trig:#F2B441; --trig-bg:#3A2D12;
+    --act:#6E9EF5;  --act-bg:#1B2B4A;
+    --logic:#A889F0; --logic-bg:#2A2244;
+    --ai:#3CC4B5;   --ai-bg:#12332F;
+    --bad:#EE7A8F;  --bad-bg:#3D1C24;
+    --good:#4CC47F; --good-bg:#15321F;
+    --code-bg:#1C2432;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161F; --paper:#171E2A; --ink:#E6EBF2; --ink2:#B4BDCB; --muted:#8792A3;
+  --line:#2A3445; --dot:#2C3647; --soft:#1D2533;
+  --trig:#F2B441; --trig-bg:#3A2D12;
+  --act:#6E9EF5;  --act-bg:#1B2B4A;
+  --logic:#A889F0; --logic-bg:#2A2244;
+  --ai:#3CC4B5;   --ai-bg:#12332F;
+  --bad:#EE7A8F;  --bad-bg:#3D1C24;
+  --good:#4CC47F; --good-bg:#15321F;
+  --code-bg:#1C2432;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+a{color:var(--act)}
+:focus-visible{outline:3px solid var(--act);outline-offset:2px;border-radius:4px}
+
+.wrap{max-width:880px;margin:0 auto;padding:0 22px}
+
+/* top nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:6px;height:52px;overflow-x:auto;scrollbar-width:none}
+.nav .wrap::-webkit-scrollbar{display:none}
+.nav .brand{font-family:var(--display);font-weight:700;margin-right:10px;white-space:nowrap}
+.nav a{font-size:14px;text-decoration:none;color:var(--ink2);padding:5px 11px;border-radius:999px;white-space:nowrap}
+.nav a:hover{background:var(--soft);color:var(--ink)}
+
+/* hero */
+.hero{padding:56px 0 28px}
+.hero h1{font-family:var(--display);font-size:clamp(40px,7vw,68px);line-height:1.02;letter-spacing:-.02em;margin:0 0 14px;font-weight:700}
+.hero p{font-size:19px;color:var(--ink2);max-width:60ch;margin:0}
+.hero-canvas{margin-top:34px}
+
+/* canvas + nodes */
+.canvas{background-color:var(--paper);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.3px);background-size:18px 18px;border:1px solid var(--line);border-radius:14px;padding:26px 20px 18px;overflow-x:auto;margin:18px 0}
+.canvas .cap{font-size:13.5px;color:var(--muted);margin-top:10px}
+.flow{display:flex;align-items:flex-start;gap:40px;width:max-content;margin:0 auto}
+.n{position:relative;display:flex;flex-direction:column;align-items:center;width:92px;text-align:center}
+.n .ic{width:62px;height:62px;border-radius:14px;display:grid;place-items:center;font-size:26px;border:2px solid var(--act);background:var(--act-bg)}
+.n .lb{font-size:12.5px;line-height:1.25;margin-top:7px;color:var(--ink);font-weight:500}
+.n .sub{font-size:11px;color:var(--muted);line-height:1.2;margin-top:2px}
+.n.t .ic{border-color:var(--trig);background:var(--trig-bg);border-radius:30px 14px 14px 30px}
+.n.l .ic{border-color:var(--logic);background:var(--logic-bg)}
+.n.ai .ic{border-color:var(--ai);background:var(--ai-bg)}
+.n.x .ic{border-color:var(--bad);background:var(--bad-bg)}
+.flow>.n:not(:last-child)::after{content:"";position:absolute;left:100%;top:31px;width:40px;height:2px;background:var(--muted)}
+.flow>.n:not(:last-child)::before{content:"";position:absolute;left:calc(100% + 32px);top:27px;border:5px solid transparent;border-left:8px solid var(--muted);border-right:0}
+
+
+.graph{display:grid;grid-auto-columns:92px;column-gap:var(--gap,64px);row-gap:26px;width:max-content;margin:0 auto;position:relative}
+.graph>.n{align-self:center;z-index:1}
+.graph svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:0}
+.graph[data-edges*="~"]{row-gap:46px}
+/* hero animation: single moment */
+.hero-flow .n .ic{transition:box-shadow .3s}
+.packet{position:absolute;top:24px;width:14px;height:14px;border-radius:50%;background:var(--ai);box-shadow:0 0 0 4px color-mix(in srgb,var(--ai) 25%,transparent);left:40px;animation:travel 5s ease-in-out infinite}
+.hero-flow{position:relative}
+@keyframes travel{0%{left:39px;opacity:0}8%{opacity:1}40%{left:171px}48%{left:171px}82%{left:303px;opacity:1}92%,100%{left:303px;opacity:0}}
+@media (prefers-reduced-motion: reduce){.packet{display:none}}
+
+/* overview */
+.overview{padding:10px 0 20px}
+h2.sec{font-family:var(--display);font-size:30px;letter-spacing:-.01em;margin:40px 0 6px}
+.overview>p{color:var(--ink2);margin:0 0 18px}
+details.ov{background:var(--paper);border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+details.ov summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:14px;padding:15px 18px}
+details.ov summary::-webkit-details-marker{display:none}
+details.ov summary .num{font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted);min-width:74px}
+details.ov summary .ttl{font-weight:600;flex:1}
+details.ov summary .chev{transition:transform .2s;color:var(--muted)}
+details.ov[open] summary .chev{transform:rotate(90deg)}
+details.ov ul{margin:0;padding:0 18px 16px 106px;list-style:none}
+details.ov li{padding:4px 0;border-top:1px dashed var(--line)}
+details.ov li:first-child{border-top:0}
+details.ov li a{color:var(--ink);text-decoration:none}
+details.ov li a:hover{color:var(--act);text-decoration:underline}
+@media (max-width:600px){details.ov ul{padding-left:18px}details.ov summary .num{min-width:auto}}
+
+/* sessions */
+.session{padding-top:30px;margin-top:40px;border-top:2px solid var(--ink)}
+.session header .num{font-family:var(--display);font-size:15px;font-weight:700;color:var(--muted)}
+.session header h2{font-family:var(--display);font-size:clamp(30px,5vw,42px);line-height:1.08;letter-spacing:-.015em;margin:4px 0 0}
+.topic{padding:26px 0 6px;border-bottom:1px solid var(--line)}
+.topic:last-child{border-bottom:0}
+.topic h3{font-family:var(--display);font-size:23px;font-weight:700;margin:0 0 8px;letter-spacing:-.005em}
+.topic p{margin:0 0 12px;max-width:72ch}
+.topic ul,.topic ol{margin:0 0 14px;padding-left:22px;max-width:70ch}
+.topic li{margin:4px 0}
+.say{border-left:4px solid var(--ai);background:var(--ai-bg);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-weight:500}
+.eg{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:14px 0}
+.eg .h{font-weight:600;font-size:14px;color:var(--trig);margin-bottom:4px}
+.warn{background:var(--trig-bg);border-radius:10px;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.task{background:var(--logic-bg);border:1.5px dashed var(--logic);border-radius:12px;padding:16px 18px;margin:14px 0}
+.task .h{font-weight:700;color:var(--logic);margin-bottom:6px}
+
+pre.code{background:var(--code-bg);border-radius:10px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:1.55;margin:12px 0;border:1px solid var(--line)}
+code{font-family:var(--mono);font-size:.9em;background:var(--code-bg);padding:1px 5px;border-radius:5px}
+pre code{background:none;padding:0}
+.k{color:var(--act)} .s{color:var(--good)} .nm{color:var(--trig)} .p{color:var(--muted)} .ex{color:var(--logic);font-weight:500}
+
+.tbl{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:15px;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft);font-weight:600;font-size:14px}
+tr:last-child td{border-bottom:0}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card .h{font-weight:600;margin-bottom:4px}
+
+/* n8n screen mock */
+.screen{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);margin:16px 0}
+.screen .bar{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.screen .bar .nm{font-weight:600;color:var(--ink)}
+.pill{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);background:var(--soft)}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)}
+.toggle i{width:30px;height:17px;border-radius:9px;background:var(--line);position:relative}
+.toggle i::after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:var(--paper)}
+.toggle.on i{background:var(--good)} .toggle.on i::after{left:15px}
+.screen .body{display:flex;min-height:220px}
+.screen .side{width:46px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:14px;font-size:16px;color:var(--muted)}
+.screen .cv{flex:1;position:relative;background-image:radial-gradient(var(--dot) 1.2px,transparent 1.3px);background-size:18px 18px;padding:34px 14px 60px;overflow-x:auto}
+.screen .run{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:var(--bad);color:#fff;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;white-space:nowrap}
+.screen .plus{position:absolute;right:14px;top:12px;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;background:var(--paper);font-weight:600}
+.callout{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:11.5px;font-weight:700;flex:none}
+.screen .cv .callout{position:absolute}
+.legend{list-style:none;padding:0;margin:10px 0 14px}
+.legend li{display:flex;gap:10px;align-items:flex-start;margin:7px 0}
+
+/* NDV mock */
+.ndv{display:grid;grid-template-columns:1fr 1.1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);margin:16px 0;font-size:13.5px}
+.ndv>div{padding:12px 14px;min-width:0}
+.ndv>div+div{border-left:1px solid var(--line)}
+.ndv .h{font-weight:700;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.ndv .mid{background:var(--soft)}
+.fld{display:flex;justify-content:space-between;gap:8px;padding:5px 8px;border-radius:6px;background:var(--paper);border:1px solid var(--line);margin-bottom:6px}
+.fld b{font-weight:600}
+.fld.drag{border-color:var(--act);box-shadow:0 2px 0 var(--act-bg)}
+.param{margin-bottom:10px}
+.param label{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+.param .in{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:var(--mono);font-size:12.5px;word-break:break-word}
+.param .in .ex{background:var(--logic-bg);padding:0 3px;border-radius:4px}
+@media (max-width:700px){.ndv{grid-template-columns:1fr}.ndv>div+div{border-left:0;border-top:1px solid var(--line)}}
+
+.url{font-family:var(--mono);font-size:14.5px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;white-space:nowrap}
+.url span{padding:2px 3px;border-radius:4px}
+.u1{background:var(--trig-bg)} .u2{background:var(--act-bg)} .u3{background:var(--logic-bg)} .u4{background:var(--ai-bg)}
+
+.fig{margin:16px 0;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto}
+.fig svg{display:block;margin:0 auto;height:auto}
+.fig .cap{font-size:13.5px;color:var(--muted);margin-top:8px;text-align:center}
+svg text{font-family:var(--body)}
+
+.blocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:14px 0}
+.blocks .card{padding:12px 14px}
+.blocks .card .h{color:var(--ai)}
+.blocks .card p{font-size:14.5px;margin:0;color:var(--ink2)}
+
+footer{padding:50px 0 60px;color:var(--muted);font-size:14px}
+
+/* progress */
+.navbar-progress{height:3px;background:var(--line)}
+.navbar-progress i{display:block;height:100%;width:0;background:var(--good);transition:width .3s}
+.nav .count{margin-left:auto;font-size:13px;color:var(--muted);white-space:nowrap;padding-left:10px}
+.prog{display:flex;align-items:center;gap:12px;margin:10px 0 18px}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--good);border-radius:99px;transition:width .3s}
+.prog .txt{font-size:14px;color:var(--ink2);white-space:nowrap}
+.reset{font:inherit;font-size:13px;background:none;border:1px solid var(--line);color:var(--ink2);border-radius:8px;padding:4px 10px;cursor:pointer}
+.reset:hover{background:var(--soft)}
+details.ov summary .mini{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+details.ov summary .mini .bar{width:60px;flex:none;height:6px}
+details.ov.complete summary .num{color:var(--good)}
+.session .prog{margin:14px 0 0}
+
+/* topic heading with number + checkbox */
+.topic h3{display:flex;align-items:flex-start;gap:12px}
+.topic h3 .tn{font-family:var(--display);color:var(--muted);font-weight:600;min-width:2.6em;flex:none}
+.topic h3 .tt{flex:1}
+.check{flex:none;display:inline-flex;align-items:center;gap:7px;font-family:var(--body);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;padding:3px 10px 3px 8px;border:1px solid var(--line);border-radius:999px;background:var(--paper);user-select:none;margin-top:2px}
+.check input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:2px solid var(--muted);border-radius:5px;margin:0;display:grid;place-items:center;cursor:pointer;background:var(--paper)}
+.check input:checked{background:var(--good);border-color:var(--good)}
+.check input:checked::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.check:has(input:checked){color:var(--good);border-color:var(--good);background:var(--good-bg)}
+.topic.done h3 .tt{color:var(--ink2)}
+@media (max-width:560px){.check .cl{display:none}.check{padding:4px}}
+
+/* project brief */
+.project{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 22px 10px;margin:34px 0 0}
+.project h2{font-family:var(--display);font-size:30px;margin:0 0 8px;letter-spacing:-.01em}
+.project p{max-width:72ch}
+
+/* google sheet mock */
+.sheet{border:1px solid var(--line);border-radius:10px;overflow:auto;margin:14px 0;background:var(--paper)}
+.sheet .tab{display:flex;gap:6px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink2);background:var(--soft);white-space:nowrap}
+.sheet .tab b{color:var(--good);font-weight:700}
+.sheet table{border:0;border-radius:0;font-size:12.5px;font-family:var(--mono);white-space:nowrap}
+.sheet th,.sheet td{padding:6px 10px;border-right:1px solid var(--line)}
+.sheet th{font-family:var(--body);font-size:12px}
+.sheet .new{background:var(--good-bg)}
+.sheet th.new{color:var(--good)}
+.sheet .rn{color:var(--muted);background:var(--soft);text-align:center;width:28px}
+.sheet .empty{color:var(--muted)}
+.sheet-note{font-size:13.5px;color:var(--muted);margin:-6px 0 14px}
+
+/* vertical graphs */
+.graph.v{grid-auto-columns:104px;column-gap:64px;row-gap:50px}
+.graph.v>.n{align-self:start;justify-self:center}
+.proj-code{font-size:13px}
+
+details.ov li a .rng{display:inline-block;min-width:5.2em;color:var(--muted);font-variant-numeric:tabular-nums;font-size:14px}
+</style>
+
+</head>
+<body>
+<nav class="nav" aria-label="Sessions">
+  <div class="wrap">
+    <span class="brand">n8n foundations</span>
+    <a href="#overview">Overview</a>
+    <a href="#project">Project</a>
+    <a href="#s1">1 Basics</a>
+    <a href="#s2">2 Data</a>
+    <a href="#s3">3 Logic</a>
+    <a href="#s4">4 APIs</a>
+    <a href="#s5">5 Go live</a>
+    <a href="#s6">6 AI &amp; agents</a>
+    <span class="count">0% done</span>
+  </div>
+  <div class="navbar-progress"><i data-overall></i></div>
+</nav>
+
+<main class="wrap">
+
+<section class="hero">
+  <h1>Let the work move by itself.</h1>
+  <p>A complete course on n8n. Across it, you build one real project: every “Contact sales” form submission for Zenroll, a made-up HR software company, gets saved, sorted, checked by Claude, answered and followed up automatically.</p>
+  <div class="canvas hero-canvas">
+    <div class="flow hero-flow">
+      <div class="packet" aria-hidden="true"></div>
+      <div class="n t"><div class="ic">📝</div><div class="lb">Google Form submitted</div><div class="sub">trigger</div></div>
+      <div class="n"><div class="ic">📊</div><div class="lb">Saved to Lead Tracker</div><div class="sub">Google Sheets</div></div>
+      <div class="n"><div class="ic">✉️</div><div class="lb">Sales team gets an email</div><div class="sub">Gmail</div></div>
+    </div>
+    <div class="cap">A prospect fills the form. Their details travel through each step, and nobody copies or pastes anything.</div>
+  </div>
+</section>
+
+<!-- ================= OVERVIEW ================= -->
+<section class="overview" id="overview">
+  <h2 class="sec">Course overview</h2>
+  <p>Six sessions. Open a session to see its topics. Tick “Done” on each topic as you finish it; progress is saved in this browser.</p>
+  <div class="prog"><div class="bar"><i data-overall></i></div><span class="txt" data-overall-txt></span><button class="reset" id="resetProgress" type="button">Reset progress</button></div>
+
+  <details class="ov" data-s="s1">
+    <summary><span class="num">Session 1</span><span class="ttl">n8n basics and your first workflow</span><span class="mini"><span class="bar"><i></i></span><span class="c"></span></span><span class="chev">›</span></summary>
+    <ul>
+      <li><a href="#s1-automation">Automation and workflows</a></li>
+      <li><a href="#s1-node">Nodes, triggers and actions</a></li>
+      <li><a href="#s1-input">Input, output and how data flows</a></li>
+      <li><a href="#s1-execution">Executions, active vs inactive and manual runs</a></li>
+      <li><a href="#s1-canvas">The workflow canvas</a></li>
+      <li><a href="#s1-install">Installing n8n and creating an account</a></li>
+      <li><a href="#s1-form">Project setup: Google Form and Lead Tracker sheet</a></li>
+      <li><a href="#s1-manual">Manual Trigger, Google Sheets Trigger and Edit Fields</a></li>
+      <li><a href="#s1-first">First workflow and assignment</a></li>
+    </ul>
+  </details>
+
+  <details class="ov" data-s="s2">
+    <summary><span class="num">Session 2</span><span class="ttl">Data, JSON and expressions</span><span class="mini"><span class="bar"><i></i></span><span class="c"></span></span><span class="chev">›</span></summary>
+    <ul>
+      <li><a href="#s2-json">JSON and key-value pairs</a></li>
+      <li><a href="#s2-objects">Objects, arrays and nested JSON</a></li>
+      <li><a href="#s2-items">Items and fields</a></li>
+      <li><a href="#s2-input">Input data, output data and data mapping</a></li>
+      <li><a href="#s2-expr">Expressions, dynamic values and the <code>{{ }}</code> syntax</a></li>
+      <li><a href="#s2-ref">Referencing a previous node</a></li>
+      <li><a href="#s2-string">Working with text, numbers and dates</a></li>
+      <li><a href="#s2-build">Project build: finish the Clean lead node</a></li>
+    </ul>
+  </details>
+
+  <details class="ov" data-s="s3">
+    <summary><span class="num">Session 3</span><span class="ttl">Workflow logic</span><span class="mini"><span class="bar"><i></i></span><span class="c"></span></span><span class="chev">›</span></summary>
+    <ul>
+      <li><a href="#s3-seq">Sequential workflows</a></li>
+      <li><a href="#s3-if">IF node and true/false branches</a></li>
+      <li><a href="#s3-switch">Switch node and multiple conditions</a></li>
+      <li><a href="#s3-filter">Filter node</a></li>
+      <li><a href="#s3-merge">Merge node</a></li>
+      <li><a href="#s3-loop">Loop Over Items and batch processing</a></li>
+      <li><a href="#s3-routing">Conditional routing, branches and rejoining</a></li>
+      <li><a href="#s3-build">Project build: route and classify</a></li>
+    </ul>
+  </details>
+
+  <details class="ov" data-s="s4">
+    <summary><span class="num">Session 4</span><span class="ttl">APIs, HTTP and webhooks</span><span class="mini"><span class="bar"><i></i></span><span class="c"></span></span><span class="chev">›</span></summary>
+    <ul>
+      <li><a href="#s4-api">APIs, client and server</a></li>
+      <li><a href="#s4-req">Request, response and HTTP</a></li>
+      <li><a href="#s4-get">GET, POST, PUT, PATCH and DELETE</a></li>
+      <li><a href="#s4-url">URLs, query parameters, headers and body</a></li>
+      <li><a href="#s4-jsonreq">JSON requests, JSON responses and status codes</a></li>
+      <li><a href="#s4-auth">Authentication, API keys and bearer tokens</a></li>
+      <li><a href="#s4-http">HTTP Request node</a></li>
+      <li><a href="#s4-webhook">Webhooks, URLs and responses</a></li>
+      <li><a href="#s4-build">Project build: the “Mark as contacted” link</a></li>
+    </ul>
+  </details>
+
+  <details class="ov" data-s="s5">
+    <summary><span class="num">Session 5</span><span class="ttl">Going live: emails, schedules and reliability</span><span class="mini"><span class="bar"><i></i></span><span class="c"></span></span><span class="chev">›</span></summary>
+    <ul>
+      <li><a href="#s5-gmail">Sending emails with Gmail</a></li>
+      <li><a href="#s5-schedule">Schedule Trigger and cron</a></li>
+      <li><a href="#s5-creds">Credentials management</a></li>
+      <li><a href="#s5-activate">Activation and execution history</a></li>
+      <li><a href="#s5-fail">Failed executions and debugging</a></li>
+      <li><a href="#s5-missing">Missing data and API failures</a></li>
+      <li><a href="#s5-capstone">Capstone build: emails and the daily reminder</a></li>
+    </ul>
+  </details>
+
+  <details class="ov" data-s="s6">
+    <summary><span class="num">Session 6</span><span class="ttl">AI, LLMs and agents in n8n</span><span class="mini"><span class="bar"><i></i></span><span class="c"></span></span><span class="chev">›</span></summary>
+    <ul>
+      <li><a href="#s6-ai">AI, generative AI and LLMs</a></li>
+      <li><a href="#s6-prompt">Prompts, system instructions, user input and responses</a></li>
+      <li><a href="#s6-tokens">Tokens, context and model settings</a></li>
+      <li><a href="#s6-halluc">Hallucination and structured output</a></li>
+      <li><a href="#s6-claude">Connecting Claude to the lead workflow</a></li>
+      <li><a href="#s6-agent">AI Agent node</a></li>
+      <li><a href="#s6-tools">Tools, tool calls, tool results and the final response</a></li>
+      <li><a href="#s6-vs">Workflow vs agent and the agent building blocks</a></li>
+    </ul>
+  </details>
+</section>
+
+<!-- ================= PROJECT ================= -->
+<section class="project" id="project">
+  <h2>The project: Zenroll lead automation</h2>
+  <p><strong>Zenroll</strong> is our made-up company. It sells cloud HR and payroll software to Indian businesses. Prospects fill a “Contact sales” Google Form on Zenroll’s website. From that moment, n8n does what a sales coordinator would do by hand: saves the lead, sends it to the right team, asks Claude whether Zenroll can actually meet the requirement, decides if the lead is hot, and gets the right email out. For hot leads, an AI agent writes a personal reply and leaves it in Gmail drafts, ready to send.</p>
+  <p>Every topic in this course uses this project as its example. Each session adds new nodes to the same workflow, and the <strong>Lead Tracker</strong> Google Sheet fills up with new columns, so you can open the sheet after every session and see the automation working.</p>
+
+  <div class="fig">
+    <div class="graph v" data-edges="f>t,t>c,c>s,s>w,w>sup:Support,w>ai:Demo / Pricing,w>par:Partnership,ai>fit,fit>h:yes / partial,fit>nf:no,h>ag:hot,h>we:regular,ag>al,al>u,we>u,nf>u">
+      <div class="n t" data-id="f" style="grid-area:1/2"><div class="ic">📝</div><div class="lb">Form submitted</div></div>
+      <div class="n t" data-id="t" style="grid-area:2/2"><div class="ic">📊</div><div class="lb">Google Sheets Trigger</div><div class="sub">new row</div></div>
+      <div class="n" data-id="c" style="grid-area:3/2"><div class="ic">✏️</div><div class="lb">Clean lead</div></div>
+      <div class="n" data-id="s" style="grid-area:4/2"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div></div>
+      <div class="n l" data-id="w" style="grid-area:5/2"><div class="ic">🚦</div><div class="lb">Switch: what do they want?</div></div>
+      <div class="n" data-id="sup" style="grid-area:6/1"><div class="ic">🎧</div><div class="lb">Forward to support</div></div>
+      <div class="n ai" data-id="ai" style="grid-area:6/2"><div class="ic">🧠</div><div class="lb">Claude reads the lead</div><div class="sub">intent, urgency, fit</div></div>
+      <div class="n" data-id="par" style="grid-area:6/3"><div class="ic">🤝</div><div class="lb">Forward to partnerships</div></div>
+      <div class="n l" data-id="fit" style="grid-area:7/2"><div class="ic">🔀</div><div class="lb">IF we can help?</div></div>
+      <div class="n l" data-id="h" style="grid-area:8/2"><div class="ic">🔀</div><div class="lb">IF hot lead?</div></div>
+      <div class="n" data-id="nf" style="grid-area:8/3"><div class="ic">🙏</div><div class="lb">Polite “not a fit” email</div></div>
+      <div class="n ai" data-id="ag" style="grid-area:9/1"><div class="ic">🤖</div><div class="lb">AI Agent drafts reply</div><div class="sub">Gmail draft tool</div></div>
+      <div class="n" data-id="we" style="grid-area:9/2"><div class="ic">👋</div><div class="lb">Welcome email</div></div>
+      <div class="n" data-id="al" style="grid-area:10/1"><div class="ic">🔥</div><div class="lb">Alert sales inbox</div></div>
+      <div class="n" data-id="u" style="grid-area:11/2"><div class="ic">📝</div><div class="lb">Update Lead Tracker</div></div>
+    </div>
+    <div class="cap">The main workflow you will have by the end of Session 6.</div>
+  </div>
+
+  <p><strong>Walkthrough with one lead.</strong> Priya from BrightPath Retail submits the form: 51-200 employees, interested in a Demo, requirement “payroll and attendance for 120 staff across 3 stores, staff should mark attendance from their phones”. Within a minute, n8n saves her lead, sends it down the sales path, and Claude reads it against Zenroll’s product description: <em>demo request, high urgency, good fit</em>. She’s hot, so the AI Agent writes her a personal reply and saves it in Gmail drafts, and the sales inbox gets an alert saying a draft is waiting. Her row in the Lead Tracker shows every step.</p>
+
+  <div class="two">
+    <div class="card"><div class="h">“Mark as contacted” link (Session 4)</div>The alert email has a link. Clicking it calls an n8n webhook, which changes that lead’s status to “Contacted” in the sheet.</div>
+    <div class="card"><div class="h">Daily follow-up reminder (Session 5)</div>Every weekday at 9 AM, n8n finds hot leads still marked “New” after their follow-up date and emails a reminder to the sales inbox.</div>
+  </div>
+
+  <h3 style="font-family:var(--display);font-size:21px;margin:22px 0 6px">Zenroll product description</h3>
+  <p>Claude and the AI Agent both get this as their system prompt, so they know what Zenroll sells. You’ll paste it into n8n in Session 6. Replace it with a real product later and the whole workflow adapts.</p>
+<pre class="code" id="zenroll-prompt"><code>You work for Zenroll, a cloud HR and payroll software company in India.
+
+Zenroll is for Indian businesses with 10 to 500 employees.
+
+What Zenroll does:
+- Monthly payroll with PF, ESI, professional tax and TDS calculated automatically
+- Attendance from the Zenroll mobile app, with GPS check-in for field and multi-location staff
+- Leave requests and approvals
+- Employee self-service app: payslips, leave balance, tax documents
+- Exports to Tally and Zoho Books
+
+Plans (list prices, per employee per month):
+- Starter: ₹79 (payroll, leave, self-service app)
+- Growth: ₹129 (adds GPS attendance and multi-location)
+
+What Zenroll does not do:
+- Payroll for employees outside India
+- Recruitment or applicant tracking
+- Biometric hardware (attendance is phone-based only)
+- Companies with more than 500 employees need the Enterprise team: treat these as a partial fit
+
+Rules:
+- Be polite and concise.
+- You may share list prices. Never offer discounts or make promises about features not listed above.
+- If you are unsure whether Zenroll fits, say "partial".</code></pre>
+</section>
+
+<!-- ================= SESSION 1 ================= -->
+<section class="session" id="s1">
+  <header><div class="num">Session 1</div><h2>n8n basics and your first workflow</h2>
+    <div class="prog"><div class="bar"><i></i></div><span class="txt"></span></div></header>
+
+  <div class="topic" id="s1-automation">
+    <h3>What is automation</h3>
+    <p>Automation means a computer does a repetitive task for you, the same way every time, without you clicking through it.</p>
+    <div class="two">
+      <div class="card"><div class="h">Without automation</div>A prospect fills Zenroll’s “Contact sales” form. Someone opens the responses sheet, copies the details into the team’s lead tracker, reads the requirement to check whether Zenroll can do it, decides if it’s worth chasing, and writes a reply. Twenty leads a day means twenty rounds of this, and the hot ones wait.</div>
+      <div class="card"><div class="h">With automation</div>The form is submitted, and within a minute the lead is saved, checked, sorted, and a reply is ready. Nobody touches it until a salesperson is actually needed.</div>
+    </div>
+    <p><strong>n8n</strong> is a tool for building these automations visually, by connecting boxes on a screen instead of writing code. That’s what our project does.</p>
+  </div>
+
+  <div class="topic" id="s1-workflow">
+    <h3>What is a workflow</h3>
+    <p>A workflow is the full set of steps for one automation, in order. Think of it as a recipe: what starts it, and what happens after that.</p>
+    <div class="canvas">
+      <div class="flow">
+        <div class="n t"><div class="ic">📝</div><div class="lb">Form submitted</div></div>
+        <div class="n"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div></div>
+        <div class="n l"><div class="ic">🔀</div><div class="lb">Is it hot?</div></div>
+        <div class="n"><div class="ic">✉️</div><div class="lb">Send the right email</div></div>
+      </div>
+      <div class="cap">Our project as a workflow: everything that should happen when a new lead comes in.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s1-node">
+    <h3>What is a node</h3>
+    <p>A node is a single step in the workflow, shown as one box on the screen. Each node does one job: read the new form response, save a row, send an email, check a condition.</p>
+    <p>The workflow above has four nodes. You build a workflow by adding nodes and connecting them with lines. By Session 6, our lead workflow will have around fifteen.</p>
+  </div>
+
+  <div class="topic" id="s1-trigger">
+    <h3>Trigger</h3>
+    <p>The trigger is the first node. It decides <em>when</em> the workflow starts. Every workflow has one starting trigger. In n8n, trigger nodes have a rounded left side.</p>
+    <div class="tbl"><table>
+      <tr><th>Trigger type</th><th>Where we use it in the project</th></tr>
+      <tr><td>App event</td><td>A new row appears in the form responses sheet (our main trigger)</td></tr>
+      <tr><td>Manual (a button)</td><td>You click “Execute workflow” to test with a fake lead</td></tr>
+      <tr><td>Schedule</td><td>Every weekday at 9 AM, check for hot leads nobody followed up (Session 5)</td></tr>
+      <tr><td>Webhook</td><td>A salesperson clicks “Mark as contacted” in an email (Session 4)</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic" id="s1-action">
+    <h3>Action</h3>
+    <p>An action is a node that <em>does</em> something after the trigger. In our project: save the lead in the sheet, send an email to the sales team, update the lead’s status. Most nodes in a workflow are actions.</p>
+    <div class="say">Trigger = when it starts. Actions = what it does.</div>
+  </div>
+
+  <div class="topic" id="s1-input">
+    <h3>Input</h3>
+    <p>Input is the data a node receives from the node before it. The “Welcome email” node needs to know the lead’s first name and email address, so it receives them as input.</p>
+  </div>
+
+  <div class="topic" id="s1-output">
+    <h3>Output</h3>
+    <p>Output is the data a node produces after doing its job. The Google Sheets Trigger outputs the new form response. That output goes straight into the next node.</p>
+  </div>
+
+  <div class="topic" id="s1-flow">
+    <h3>How data flows through a workflow</h3>
+    <p>Data moves from left to right. Each node’s output becomes the next node’s input.</p>
+    <div class="fig">
+      <svg viewBox="0 0 720 200" width="720" role="img" aria-label="Priya's form response passing from node to node">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+        <rect x="20" y="40" width="130" height="64" rx="14" fill="var(--trig-bg)" stroke="var(--trig)" stroke-width="2"/>
+        <text x="85" y="70" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Form response</text>
+        <text x="85" y="89" text-anchor="middle" font-size="12" fill="var(--ink2)">trigger</text>
+        <rect x="295" y="40" width="130" height="64" rx="14" fill="var(--act-bg)" stroke="var(--act)" stroke-width="2"/>
+        <text x="360" y="70" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Save to tracker</text>
+        <text x="360" y="89" text-anchor="middle" font-size="12" fill="var(--ink2)">action</text>
+        <rect x="570" y="40" width="130" height="64" rx="14" fill="var(--act-bg)" stroke="var(--act)" stroke-width="2"/>
+        <text x="635" y="70" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Send email</text>
+        <text x="635" y="89" text-anchor="middle" font-size="12" fill="var(--ink2)">action</text>
+        <line x1="150" y1="72" x2="292" y2="72" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar)"/>
+        <line x1="425" y1="72" x2="567" y2="72" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar)"/>
+        <rect x="160" y="118" width="128" height="62" rx="8" fill="var(--ai-bg)" stroke="var(--ai)"/>
+        <text x="170" y="138" font-size="11.5" font-family="IBM Plex Mono, monospace" fill="var(--ink)">name: Priya Sharma</text>
+        <text x="170" y="155" font-size="11.5" font-family="IBM Plex Mono, monospace" fill="var(--ink)">company: BrightPath</text>
+        <text x="170" y="172" font-size="11.5" font-family="IBM Plex Mono, monospace" fill="var(--ink)">city: Pune</text>
+        <rect x="435" y="118" width="128" height="62" rx="8" fill="var(--ai-bg)" stroke="var(--ai)"/>
+        <text x="445" y="138" font-size="11.5" font-family="IBM Plex Mono, monospace" fill="var(--ink)">name: Priya Sharma</text>
+        <text x="445" y="155" font-size="11.5" font-family="IBM Plex Mono, monospace" fill="var(--ink)">company: BrightPath</text>
+        <text x="445" y="172" font-size="11.5" font-family="IBM Plex Mono, monospace" fill="var(--ink)">status: New</text>
+        <text x="222" y="30" text-anchor="middle" font-size="12" fill="var(--muted)">output → input</text>
+        <text x="497" y="30" text-anchor="middle" font-size="12" fill="var(--muted)">output → input</text>
+      </svg>
+      <div class="cap">Priya’s form response is handed from one node to the next, like a lead file passed down a line of desks.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s1-execution">
+    <h3>Workflow execution</h3>
+    <p>An execution is one run of the workflow, from trigger to last node. If five prospects fill the form today, the lead workflow executes five times, once per lead. n8n keeps a record of every execution so you can see exactly what happened to each lead.</p>
+  </div>
+
+  <div class="topic" id="s1-active">
+    <h3>Active vs inactive workflow</h3>
+    <div class="two">
+      <div class="card"><div class="h">Inactive</div>The workflow only runs when you run it yourself for testing. New form responses are ignored. Like a shop with the “Closed” sign up: you can walk around inside, but no customers come in.</div>
+      <div class="card"><div class="h">Active</div>Every new form response is picked up automatically, day or night. The “Open” sign is up.</div>
+    </div>
+    <p>You switch this in the top bar of the workflow. Depending on the n8n version, it’s an <strong>Active</strong> toggle or a <strong>Publish</strong> button. We keep the lead workflow inactive while building and switch it on in Session 5.</p>
+  </div>
+
+  <div class="topic" id="s1-manualrun">
+    <h3>Manual execution</h3>
+    <p>Manual execution means you click <strong>Execute workflow</strong> to run it right now. This is how you test while building, without waiting for a real prospect. You can also run a single node with its own play button to check just that step.</p>
+  </div>
+
+  <div class="topic" id="s1-canvas">
+    <h3>Workflow canvas</h3>
+    <p>The canvas is the dotted workspace where you place and connect nodes.</p>
+    <div class="screen" aria-label="Mock of the n8n editor">
+      <div class="bar">
+        <span class="callout">1</span><span class="nm">Lead automation</span>
+        <span style="flex:1"></span>
+        <span class="callout">2</span><span class="toggle"><i></i>Inactive</span>
+        <span class="pill">Save</span>
+      </div>
+      <div class="body">
+        <div class="side"><span class="callout">3</span><span>🏠</span><span>📁</span><span>🔑</span><span>🕘</span></div>
+        <div class="cv">
+          <span class="plus">+</span><span class="callout" style="right:50px;top:17px">4</span>
+          <div class="flow">
+            <div class="n t"><div class="ic">📊</div><div class="lb">New form response</div></div>
+            <div class="n"><div class="ic">✏️</div><div class="lb">Clean lead</div></div>
+            <div class="n"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div></div>
+          </div>
+          <span class="run">▶ Execute workflow</span><span class="callout" style="left:calc(50% + 86px);bottom:18px">5</span>
+        </div>
+      </div>
+    </div>
+    <ul class="legend">
+      <li><span class="callout">1</span><span>Workflow name. Ours is “Lead automation”.</span></li>
+      <li><span class="callout">2</span><span>Active / inactive switch and Save.</span></li>
+      <li><span class="callout">3</span><span>Left menu: overview, projects, credentials (saved logins) and executions (run history).</span></li>
+      <li><span class="callout">4</span><span>The + button opens the nodes panel, where you search for any node, such as “Google Sheets” or “IF”.</span></li>
+      <li><span class="callout">5</span><span>Execute workflow runs it once for testing.</span></li>
+    </ul>
+  </div>
+
+  <div class="topic" id="s1-install">
+    <h3>Installation (n8n Cloud or npm)</h3>
+    <p>There are two ways to run n8n. <strong>For this course we use n8n Cloud</strong>, because connecting Google Forms, Sheets and Gmail takes one click there.</p>
+    <div class="two">
+      <div class="card"><div class="h">Option A: n8n Cloud (what we use)</div>
+        Go to <strong>n8n.io</strong> and start a free trial. n8n runs in your browser. Webhooks and schedules work all the time, even when your laptop is off. Google apps connect with “Sign in with Google”. Paid after the trial ends.
+      </div>
+      <div class="card"><div class="h">Option B: on your laptop with npm (free)</div>
+        Install Node.js from <strong>nodejs.org</strong> like any normal app. Check the n8n docs for the supported Node.js version first. Then run the commands below.
+      </div>
+    </div>
+<pre class="code"><code><span class="p"># check Node.js is installed</span>
+node -v
+
+<span class="p"># quickest way to start n8n</span>
+npx n8n
+
+<span class="p"># or install it once, then start it any time</span>
+npm install n8n -g
+n8n start</code></pre>
+    <p>When it says it’s ready, open <code>http://localhost:5678</code> in your browser. <strong>localhost</strong> just means “this computer”. To stop n8n, press <code>Ctrl + C</code> in the terminal.</p>
+    <div class="warn">On the laptop option, n8n only runs while the terminal is open and the laptop is awake, and connecting Google apps needs extra setup in Google Cloud Console first. That’s why the project uses Cloud.</div>
+  </div>
+
+  <div class="topic" id="s1-account">
+    <h3>Creating account</h3>
+    <p>On n8n Cloud, sign up on n8n.io with your email and pick a workspace name. Your n8n address will look like <code>https://yourname.app.n8n.cloud</code>. (On the laptop option, the first visit to <code>localhost:5678</code> asks you to create an owner account instead.)</p>
+    <p>Then click <strong>Create workflow</strong> and name it <strong>Lead automation</strong>.</p>
+  </div>
+
+  <div class="topic" id="s1-form">
+    <h3>Project setup: Google Form and Lead Tracker sheet</h3>
+    <p><strong>1. Create the Google Form</strong> (forms.google.com), titled “Zenroll – Contact sales”, with these questions. Mark every question <strong>Required</strong>.</p>
+    <div class="tbl"><table>
+      <tr><th>Question</th><th>Type</th><th>Why we ask</th></tr>
+      <tr><td>Full name</td><td>Short answer</td><td>Personal emails</td></tr>
+      <tr><td>Work email</td><td>Short answer (response validation: email)</td><td>Where replies go</td></tr>
+      <tr><td>Phone</td><td>Short answer</td><td>So sales can call</td></tr>
+      <tr><td>Company name</td><td>Short answer</td><td>Context for the reply</td></tr>
+      <tr><td>Company size</td><td>Dropdown: 1-10, 11-50, 51-200, 201-500, 500+</td><td>Bigger companies are hot leads</td></tr>
+      <tr><td>City</td><td>Dropdown: Mumbai, Pune, Hyderabad, Bengaluru, Delhi, Chennai, Other</td><td>Kept on record</td></tr>
+      <tr><td>Interested in</td><td>Multiple choice: Demo, Pricing, Support, Partnership</td><td>Decides which team gets it</td></tr>
+      <tr><td>Requirement</td><td>Paragraph: “What do you need Zenroll to do for you?”</td><td>Claude checks if Zenroll can do it</td></tr>
+      <tr><td>Timeline</td><td>Dropdown: Immediately / this week, Within a month, Just exploring</td><td>Quick urgency signal, checked alongside what Claude reads in Requirement</td></tr>
+    </table></div>
+    <p><strong>2. Link it to a sheet.</strong> In the form, open <strong>Responses → Link to Sheets</strong>. Google creates a sheet with a tab called “Form Responses 1”. Every submission becomes a new row there automatically, with a Timestamp column added.</p>
+    <p><strong>3. Create the Lead Tracker.</strong> Make a new Google Sheet called “Lead Tracker” with one tab called <strong>Leads</strong>. This is where n8n writes, so the raw form sheet stays untouched. Add all the headers now; the columns fill up session by session.</p>
+<pre class="code"><code>lead_id, received_at, name, first_name, email, phone, company, company_size, city, interest, requirement, timeline, status, follow_up_date, route, lead_type, ai_intent, ai_urgency, ai_fit, ai_fit_reason, ai_summary, draft_created, email_sent, email_sent_at</code></pre>
+    <p><strong>4. Submit four test responses</strong> to your own form. We use these leads throughout the course:</p>
+    <div class="tbl"><table>
+      <tr><th>Name / company</th><th>Size</th><th>Interested in</th><th>Requirement</th><th>Timeline</th></tr>
+      <tr><td>Priya Sharma, BrightPath Retail</td><td>51-200</td><td>Demo</td><td>Payroll and attendance for 120 staff across 3 stores. Staff should mark attendance from their phones.</td><td>Immediately / this week</td></tr>
+      <tr><td>Rahul Verma, QuickFix Services</td><td>11-50</td><td>Pricing</td><td>Payroll for 35 employees, plus a tool to track job applicants.</td><td>Within a month</td></tr>
+      <tr><td>Anita Rao, GreenLeaf Foods</td><td>1-10</td><td>Support</td><td>Can’t log in to the employee app.</td><td>Immediately / this week</td></tr>
+      <tr><td>Karan Mehta, Nomad Tech</td><td>11-50</td><td>Demo</td><td>Payroll for our team in Dubai and the US.</td><td>Immediately / this week</td></tr>
+    </table></div>
+    <p>Use your own email addresses for all four so every email in the course lands in your inbox.</p>
+  </div>
+
+  <div class="topic" id="s1-manual">
+    <h3>Manual Trigger node</h3>
+    <p>The simplest trigger: it starts the workflow when you click <strong>Execute workflow</strong>. On the canvas it appears as “When clicking ‘Execute workflow’”.</p>
+    <p>In the project, use it when you want to test with a made-up lead without filling the form: Manual Trigger → Edit Fields with a fake lead → the rest of the workflow. Once things work, the real trigger takes over.</p>
+  </div>
+
+  <div class="topic" id="s1-sheetstrigger">
+    <h3>Google Sheets Trigger</h3>
+    <p>This is our project’s real trigger. n8n has no direct “Google Form submitted” trigger, but every submission adds a row to the linked responses sheet, so we watch that sheet instead.</p>
+    <div class="ndv">
+      <div><div class="h">Credential</div>Google Sheets Trigger account<br><span style="color:var(--muted)">connect with “Sign in with Google”</span></div>
+      <div class="mid"><div class="h">Google Sheets Trigger</div>
+        <div class="param"><label>Poll times</label><div class="in">Every minute</div></div>
+        <div class="param"><label>Document</label><div class="in">Contact sales (Responses)</div></div>
+        <div class="param"><label>Sheet</label><div class="in">Form Responses 1</div></div>
+        <div class="param"><label>Trigger on</label><div class="in">Row added</div></div>
+      </div>
+      <div><div class="h">Output</div>
+        <div class="fld"><b>Timestamp</b><span>27/09/2026 10:15</span></div>
+        <div class="fld"><b>Full name</b><span>Priya Sharma</span></div>
+        <div class="fld"><b>Work email</b><span>Priya@BrightPath.in</span></div>
+        <div class="fld"><b>City</b><span>Pune</span></div>
+      </div>
+    </div>
+    <p>“Every minute” means n8n checks the sheet once a minute, so a lead shows up within about a minute of submission. While building, click <strong>Fetch test event</strong> to pull in the latest row.</p>
+  </div>
+
+  <div class="topic" id="s1-set">
+    <h3>Edit Fields (Set) node</h3>
+    <p>This node creates or changes pieces of data. You add a field name and a value, and the node outputs them. In the project, the <strong>Clean lead</strong> node turns the form’s long column names into short, tidy ones that match the Lead Tracker headers.</p>
+    <div class="ndv">
+      <div><div class="h">Input (from trigger)</div>
+        <div class="fld drag"><b>Full name</b><span>Priya Sharma</span></div>
+        <div class="fld"><b>Work email</b><span>Priya@BrightPath.in</span></div>
+        <div class="fld"><b>Company name</b><span>BrightPath Retail</span></div>
+      </div>
+      <div class="mid"><div class="h">Edit Fields: Clean lead</div>
+        <div class="param"><label>name</label><div class="in"><span class="ex">{{ $json['Full name'] }}</span></div></div>
+        <div class="param"><label>email</label><div class="in"><span class="ex">{{ $json['Work email'] }}</span></div></div>
+        <div class="param"><label>company</label><div class="in"><span class="ex">{{ $json['Company name'] }}</span></div></div>
+        <div class="param"><label>status</label><div class="in">New</div></div>
+      </div>
+      <div><div class="h">Output</div>
+        <div class="fld"><b>name</b><span>Priya Sharma</span></div>
+        <div class="fld"><b>email</b><span>Priya@BrightPath.in</span></div>
+        <div class="fld"><b>company</b><span>BrightPath Retail</span></div>
+        <div class="fld"><b>status</b><span>New</span></div>
+      </div>
+    </div>
+    <p>You don’t type the purple parts. Drag a field from the input panel into the value box and n8n writes it for you. Session 2 explains what it means.</p>
+  </div>
+
+  <div class="topic" id="s1-first">
+    <h3>Building first workflow</h3>
+    <div class="canvas">
+      <div class="flow">
+        <div class="n t"><div class="ic">📊</div><div class="lb">Google Sheets Trigger</div><div class="sub">row added</div></div>
+        <div class="n"><div class="ic">✏️</div><div class="lb">Clean lead</div><div class="sub">Edit Fields</div></div>
+        <div class="n"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div><div class="sub">Google Sheets: append row</div></div>
+      </div>
+    </div>
+    <ol>
+      <li>Add a <strong>Google Sheets Trigger</strong> set up as in 1.17 and click <strong>Fetch test event</strong>. Priya’s (or your latest) response appears in the output.</li>
+      <li>Add <strong>Edit Fields</strong>, rename it “Clean lead”, and drag in fields so you have: <code>received_at</code> (Timestamp), <code>name</code>, <code>email</code>, <code>phone</code>, <code>company</code>, <code>company_size</code>, <code>city</code>, <code>interest</code>, <code>requirement</code>, <code>timeline</code>, and <code>status</code> = New.</li>
+      <li>Add <strong>Google Sheets → Append row</strong>, rename it “Save to Lead Tracker”. Document: Lead Tracker, Sheet: Leads, Mapping: <strong>Map automatically</strong>. Field names that match column headers go into those columns.</li>
+      <li>Click <strong>Execute workflow</strong>. All three nodes turn green.</li>
+      <li>Open the Lead Tracker sheet. The lead is there.</li>
+    </ol>
+    <div class="sheet">
+      <div class="tab"><b>Lead Tracker</b> › Leads (after Session 1)</div>
+      <table>
+        <tr><th class="rn"></th><th class="new">received_at</th><th class="new">name</th><th class="new">email</th><th class="new">company</th><th class="new">company_size</th><th class="new">city</th><th class="new">interest</th><th class="new">status</th><th>lead_id</th><th>lead_type</th><th>…</th></tr>
+        <tr><td class="rn">2</td><td class="new">27/09/2026 10:15</td><td class="new">Priya Sharma</td><td class="new">Priya@BrightPath.in</td><td class="new">BrightPath Retail</td><td class="new">51-200</td><td class="new">Pune</td><td class="new">Demo</td><td class="new">New</td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+      </table>
+    </div>
+    <p class="sheet-note">Green = filled in this session. The other columns fill up in later sessions.</p>
+  </div>
+
+  <div class="topic" id="s1-assign">
+    <h3>Student assignment workflow</h3>
+    <div class="task">
+      <div class="h">Your turn</div>
+      <ol style="margin:0;padding-left:20px">
+        <li>Submit Rahul’s, Anita’s and Karan’s responses to the form.</li>
+        <li>Fetch each as a test event and run the workflow. Check they all appear in the Leads tab.</li>
+        <li>Build a second, small workflow for testing: <strong>Manual Trigger → Edit Fields “Test lead”</strong> with your own details, then check its output. This is how you’ll test without the form.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SESSION 2 ================= -->
+<section class="session" id="s2">
+  <header><div class="num">Session 2</div><h2>Data, JSON and expressions</h2>
+    <div class="prog"><div class="bar"><i></i></div><span class="txt"></span></div></header>
+
+  <div class="topic" id="s2-json">
+    <h3>What is JSON</h3>
+    <p>JSON is the format apps use to pass data to each other. It looks like a filled-in contact card: a label, then a value. Every node in n8n sends and receives JSON. Here is Priya’s form response, exactly as the Google Sheets Trigger outputs it (switch the output panel to <strong>JSON</strong> view to see this):</p>
+<pre class="code"><code><span class="p">{</span>
+  <span class="k">"row_number"</span>: <span class="nm">2</span>,
+  <span class="k">"Timestamp"</span>: <span class="s">"27/09/2026 10:15:32"</span>,
+  <span class="k">"Full name"</span>: <span class="s">"Priya Sharma"</span>,
+  <span class="k">"Work email"</span>: <span class="s">" Priya@BrightPath.in"</span>,
+  <span class="k">"Phone"</span>: <span class="nm">9876543210</span>,
+  <span class="k">"Company name"</span>: <span class="s">"BrightPath Retail"</span>,
+  <span class="k">"Company size"</span>: <span class="s">"51-200"</span>,
+  <span class="k">"City"</span>: <span class="s">"Pune"</span>,
+  <span class="k">"Interested in"</span>: <span class="s">"Demo"</span>,
+  <span class="k">"Requirement"</span>: <span class="s">"Payroll and attendance for 120 staff across 3 stores. Staff should mark attendance from their phones."</span>,
+  <span class="k">"Timeline"</span>: <span class="s">"Immediately / this week"</span>
+<span class="p">}</span></code></pre>
+    <p>Text goes in quotes. Numbers don’t. <code>true</code> and <code>false</code> are yes/no values, also without quotes. Notice the email has a stray space and capital letters. People type messy data, and we’ll clean it in this session.</p>
+  </div>
+
+  <div class="topic" id="s2-kv">
+    <h3>Key-value pairs</h3>
+    <p>Each line is a key-value pair. The <span style="color:var(--act);font-weight:600">key</span> is the label (<code>"City"</code>), and the <span style="color:var(--good);font-weight:600">value</span> is the data (<code>"Pune"</code>). A colon sits between them, and a comma separates each pair. In the form response, the keys are your form’s questions and the values are Priya’s answers.</p>
+  </div>
+
+  <div class="topic" id="s2-objects">
+    <h3>Objects</h3>
+    <p>An object is a group of key-value pairs inside curly braces <code>{ }</code>. One object usually describes one thing. Priya’s whole response above is one object: one lead.</p>
+  </div>
+
+  <div class="topic" id="s2-arrays">
+    <h3>Arrays</h3>
+    <p>An array is a list inside square brackets <code>[ ]</code>. Our three test leads, as a list:</p>
+<pre class="code"><code><span class="p">[</span>
+  <span class="p">{</span> <span class="k">"name"</span>: <span class="s">"Priya Sharma"</span>, <span class="k">"company_size"</span>: <span class="s">"51-200"</span>, <span class="k">"interest"</span>: <span class="s">"Demo"</span> <span class="p">}</span>,
+  <span class="p">{</span> <span class="k">"name"</span>: <span class="s">"Rahul Verma"</span>, <span class="k">"company_size"</span>: <span class="s">"11-50"</span>, <span class="k">"interest"</span>: <span class="s">"Pricing"</span> <span class="p">}</span>,
+  <span class="p">{</span> <span class="k">"name"</span>: <span class="s">"Anita Rao"</span>, <span class="k">"company_size"</span>: <span class="s">"1-10"</span>, <span class="k">"interest"</span>: <span class="s">"Support"</span> <span class="p">}</span>
+<span class="p">]</span></code></pre>
+  </div>
+
+  <div class="topic" id="s2-nested">
+    <h3>Nested JSON</h3>
+    <p>Nested means an object inside another object. In Session 6, Claude reads Priya’s lead and its answer comes back nested like this:</p>
+<pre class="code"><code><span class="p">{</span>
+  <span class="k">"output"</span>: <span class="p">{</span>
+    <span class="k">"intent"</span>: <span class="s">"Demo request"</span>,
+    <span class="k">"urgency"</span>: <span class="s">"high"</span>,
+    <span class="k">"fit"</span>: <span class="s">"yes"</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+    <p>To reach the fit, you go one level at a time: <code>output</code>, then <code>fit</code>, written as <code>output.fit</code>. Lists work the same way with a position number in square brackets, counting from 0: the first item of a list called <code>tags</code> is <code>tags[0]</code>.</p>
+  </div>
+
+  <div class="topic" id="s2-items">
+    <h3>Items</h3>
+    <p>In n8n, each object passing through is called an <strong>item</strong>. One form response = one item. If the trigger finds three new responses at once, that’s three items, and every following node automatically runs once for <em>each</em> item.</p>
+    <div class="canvas">
+      <div class="flow">
+        <div class="n t"><div class="ic">📊</div><div class="lb">Sheets Trigger</div><div class="sub">3 new rows = 3 items</div></div>
+        <div class="n"><div class="ic">✏️</div><div class="lb">Clean lead</div><div class="sub">runs 3 times</div></div>
+        <div class="n"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div><div class="sub">3 rows added</div></div>
+      </div>
+      <div class="cap">Three leads in, three rows saved. You don’t need to set up any repeating.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s2-fields">
+    <h3>Fields</h3>
+    <p>A field is one key-value pair on an item, such as <code>city</code>. In n8n’s <strong>Table</strong> view, fields are columns and items are rows, just like the Lead Tracker sheet.</p>
+  </div>
+
+  <div class="topic" id="s2-input">
+    <h3>Input data</h3>
+    <p>Open the Clean lead node. The left panel shows its input: the raw form response from the trigger, with long names like “Full name” and “Work email”. You can switch each panel between <strong>Table</strong>, <strong>JSON</strong> and <strong>Schema</strong> views.</p>
+  </div>
+
+  <div class="topic" id="s2-output">
+    <h3>Output data</h3>
+    <p>The right panel shows its output: the cleaned lead with short names like <code>name</code> and <code>email</code>. That output is exactly what “Save to Lead Tracker” receives as input.</p>
+  </div>
+
+  <div class="topic" id="s2-map">
+    <h3>Data mapping</h3>
+    <p>Mapping means telling a node where to get a value from. The easy way: drag a field from the input panel and drop it into a setting. You did this in Session 1 when building Clean lead. Here it is in the hot-lead alert email (built in Session 5):</p>
+    <div class="ndv">
+      <div><div class="h">Input</div>
+        <div class="fld drag"><b>name</b><span>Priya Sharma</span></div>
+        <div class="fld"><b>company</b><span>BrightPath Retail</span></div>
+        <div class="fld"><b>company_size</b><span>51-200</span></div>
+      </div>
+      <div class="mid"><div class="h">Gmail: Send</div>
+        <div class="param"><label>Subject</label><div class="in">New lead: <span class="ex">{{ $json.name }}</span></div></div>
+        <div class="param"><label>Message</label><div class="in"><span class="ex">{{ $json.company }}</span>, <span class="ex">{{ $json.company_size }}</span> employees</div></div>
+      </div>
+      <div><div class="h">Email sent</div>
+        <div class="fld"><b>subject</b><span>New lead: Priya Sharma</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic" id="s2-expr">
+    <h3>Expressions</h3>
+    <p>An expression is a value that is filled in automatically each time the workflow runs, instead of being typed once. It works like mail-merge: “New lead: <em>name</em>” becomes “New lead: Priya Sharma” for Priya and “New lead: Rahul Verma” for Rahul.</p>
+  </div>
+
+  <div class="topic" id="s2-dyn">
+    <h3>Dynamic values</h3>
+    <p>A fixed value is the same every run: <code>status</code> = “New” is fixed, because every new lead starts as New. A dynamic value changes with the data: <code>name</code> is different for every lead. In a setting, switch from <strong>Fixed</strong> to <strong>Expression</strong> to make it dynamic.</p>
+  </div>
+
+  <div class="topic" id="s2-syntax">
+    <h3>The <code>{{ }}</code> syntax</h3>
+    <p>Anything inside double curly braces is worked out by n8n. <code>$json</code> means “the data of the current item coming into this node”.</p>
+    <div class="tbl"><table>
+      <tr><th>You write</th><th>n8n shows (for Priya)</th></tr>
+      <tr><td><code>{{ $json.City }}</code></td><td>Pune</td></tr>
+      <tr><td><code>{{ $json['Full name'] }}</code></td><td>Priya Sharma</td></tr>
+      <tr><td><code>New lead from {{ $json.City }}</code></td><td>New lead from Pune</td></tr>
+      <tr><td><code>{{ $json['Full name'] }} ({{ $json['Company name'] }})</code></td><td>Priya Sharma (BrightPath Retail)</td></tr>
+      <tr><td><code>{{ $json.output.fit }}</code></td><td>yes (Session 6)</td></tr>
+    </table></div>
+    <p>Keys with spaces, like the form’s “Full name”, need square brackets and quotes: <code>$json['Full name']</code>. That’s one reason Clean lead renames them to simple names. The expression editor shows a live preview as you type.</p>
+  </div>
+
+  <div class="topic" id="s2-ref">
+    <h3>Referencing previous nodes</h3>
+    <p><code>$json</code> only sees the node directly before. To grab data from a node further back, use its name:</p>
+<pre class="code"><code><span class="ex">{{ $('Clean lead').item.json.lead_id }}</span></code></pre>
+    <p>Read it as: “from the node called Clean lead, take this item’s lead_id”. We need this later: after an email is sent, the Gmail node’s output is about the email, not the lead, so the next node reaches back to Clean lead to find which row to update. This is why clear node names matter. You can also pick earlier nodes in the input panel and drag from there.</p>
+  </div>
+
+  <div class="topic" id="s2-string">
+    <h3>String manipulation</h3>
+    <p>A string is text. You can change text inside an expression. These go into Clean lead:</p>
+    <div class="tbl"><table>
+      <tr><th>Goal</th><th>Expression</th><th>Result</th></tr>
+      <tr><td>Clean the email</td><td><code>{{ $json['Work email'].trim().toLowerCase() }}</code></td><td>priya@brightpath.in</td></tr>
+      <tr><td>First name for emails</td><td><code>{{ $json['Full name'].split(' ')[0] }}</code></td><td>Priya</td></tr>
+      <tr><td>Tidy the name</td><td><code>{{ $json['Full name'].trim() }}</code></td><td>Priya Sharma</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic" id="s2-number">
+    <h3>Number manipulation</h3>
+    <div class="tbl"><table>
+      <tr><th>Goal</th><th>Expression</th><th>Result</th></tr>
+      <tr><td>A readable lead ID from the row number</td><td><code>L-{{ 1000 + $json.row_number }}</code></td><td>L-1002</td></tr>
+      <tr><td>Count phone digits (used for checking in Session 5)</td><td><code>{{ $json.Phone.toString().length }}</code></td><td>10</td></tr>
+      <tr><td>Follow-up days by size</td><td><code>{{ $json['Company size'] === '1-10' ? 5 : 2 }}</code></td><td>2</td></tr>
+    </table></div>
+    <p>The last one reads: “if the company is 1-10 people, 5 days, otherwise 2 days”. Bigger companies get followed up sooner.</p>
+  </div>
+
+  <div class="topic" id="s2-date">
+    <h3>Date/time values</h3>
+    <p><code>$now</code> is the current date and time. <code>$today</code> is today at midnight.</p>
+    <div class="tbl"><table>
+      <tr><th>Goal</th><th>Expression</th><th>Result</th></tr>
+      <tr><td>Follow-up date, 2 days out</td><td><code>{{ $now.plus({ days: 2 }).toFormat('yyyy-MM-dd') }}</code></td><td>2026-09-29</td></tr>
+      <tr><td>Readable date for emails</td><td><code>{{ $now.toFormat('dd LLL yyyy') }}</code></td><td>27 Sep 2026</td></tr>
+      <tr><td>Day of week</td><td><code>{{ $now.toFormat('cccc') }}</code></td><td>Sunday</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic" id="s2-build">
+    <h3>Project build: finish the Clean lead node</h3>
+    <p>Open Clean lead and change or add these fields using what you just learned:</p>
+    <div class="tbl"><table>
+      <tr><th>Field</th><th>Value</th></tr>
+      <tr><td>lead_id</td><td><code>L-{{ 1000 + $json.row_number }}</code></td></tr>
+      <tr><td>email</td><td><code>{{ $json['Work email'].trim().toLowerCase() }}</code></td></tr>
+      <tr><td>first_name</td><td><code>{{ $json['Full name'].split(' ')[0] }}</code></td></tr>
+      <tr><td>follow_up_date</td><td><code>{{ $now.plus({ days: 2 }).toFormat('yyyy-MM-dd') }}</code></td></tr>
+    </table></div>
+    <p>Run it with Rahul’s response and open the sheet.</p>
+    <div class="sheet">
+      <div class="tab"><b>Lead Tracker</b> › Leads (after Session 2)</div>
+      <table>
+        <tr><th class="rn"></th><th class="new">lead_id</th><th>received_at</th><th>name</th><th class="new">first_name</th><th class="new">email</th><th>company</th><th>city</th><th>status</th><th class="new">follow_up_date</th><th>…</th></tr>
+        <tr><td class="rn">2</td><td class="new">L-1002</td><td>27/09/2026 10:15</td><td>Priya Sharma</td><td class="new">Priya</td><td class="new">priya@brightpath.in</td><td>BrightPath Retail</td><td>Pune</td><td>New</td><td class="new">2026-09-29</td><td class="empty"></td></tr>
+        <tr><td class="rn">3</td><td class="new">L-1003</td><td>27/09/2026 10:22</td><td>Rahul Verma</td><td class="new">Rahul</td><td class="new">rahul@quickfix.co</td><td>QuickFix Services</td><td>Mumbai</td><td>New</td><td class="new">2026-09-29</td><td class="empty"></td></tr>
+      </table>
+    </div>
+    <div class="say">Data produced by one node becomes input for another node. Everything in n8n, and later in Claude tool use, builds on this idea.</div>
+  </div>
+</section>
+
+<!-- ================= SESSION 3 ================= -->
+<section class="session" id="s3">
+  <header><div class="num">Session 3</div><h2>Workflow logic</h2>
+    <div class="prog"><div class="bar"><i></i></div><span class="txt"></span></div></header>
+
+  <div class="topic" id="s3-seq">
+    <h3>Sequential workflows</h3>
+    <p>A sequential workflow runs every step in a straight line for every item. Our workflow so far is sequential: trigger → clean → save. But Anita’s support request shouldn’t go to the sales team, and Priya’s 120-person company deserves faster attention than a 5-person one. Real work needs decisions.</p>
+    <div class="say">A workflow follows rules that we define.</div>
+  </div>
+
+  <div class="topic" id="s3-if">
+    <h3>IF node</h3>
+    <p>The IF node asks a yes/no question about each item and sends it down one of two paths, like a sales manager sorting lead cards into two piles. Our question: <strong>is this a hot lead?</strong></p>
+    <div class="canvas">
+      <div class="graph" style="--gap:92px" data-edges="r>i,i>a:true,i>b:false">
+        <div class="n l" data-id="r" style="grid-area:1/1/3"><div class="ic">🚦</div><div class="lb">Switch</div><div class="sub">sales path</div></div>
+        <div class="n l" data-id="i" style="grid-area:1/2/3"><div class="ic">🔀</div><div class="lb">IF hot lead?</div><div class="sub">size 51-200 or bigger</div></div>
+        <div class="n" data-id="a" style="grid-area:1/3"><div class="ic">🔥</div><div class="lb">Mark hot</div></div>
+        <div class="n" data-id="b" style="grid-area:2/3"><div class="ic">📨</div><div class="lb">Mark regular</div></div>
+      </div>
+    </div>
+    <p>Setting it up: drag in <code>company_size</code>, choose <strong>String → is equal to</strong>, type <code>51-200</code>. Then add conditions for <code>201-500</code> and <code>500+</code> (see 3.5). In Session 6, Claude’s urgency joins this rule.</p>
+  </div>
+
+  <div class="topic" id="s3-tf">
+    <h3>True / false branches</h3>
+    <p>The IF node has two outputs. Items that pass go out of <strong>true</strong>, the rest go out of <strong>false</strong>. Each branch can have its own nodes. Priya (51-200) goes out of true. Rahul (11-50) goes out of false.</p>
+  </div>
+
+  <div class="topic" id="s3-switch">
+    <h3>Switch node</h3>
+    <p>IF gives two paths. Switch gives as many as you need, like a receptionist sending each caller to the right department. We switch on <code>interest</code>:</p>
+    <div class="canvas">
+      <div class="graph" style="--gap:120px" data-edges="t>w,w>a:Support,w>b:Demo / Pricing,w>c:Partnership">
+        <div class="n" data-id="t" style="grid-area:1/1/4"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div></div>
+        <div class="n l" data-id="w" style="grid-area:1/2/4"><div class="ic">🚦</div><div class="lb">Switch</div><div class="sub">on interest</div></div>
+        <div class="n" data-id="a" style="grid-area:1/3"><div class="ic">🎧</div><div class="lb">Support team</div></div>
+        <div class="n" data-id="b" style="grid-area:2/3"><div class="ic">💼</div><div class="lb">Sales path</div></div>
+        <div class="n" data-id="c" style="grid-area:3/3"><div class="ic">🤝</div><div class="lb">Partnerships team</div></div>
+      </div>
+    </div>
+    <p>Each rule becomes one output. Anita goes to Support, Priya and Rahul to the sales path. Turn on the <strong>Fallback output</strong> option to catch anything that matches no rule.</p>
+  </div>
+
+  <div class="topic" id="s3-multi">
+    <h3>Multiple conditions</h3>
+    <p>IF, Switch and Filter can check more than one thing at once.</p>
+    <div class="two">
+      <div class="card"><div class="h">OR: any one is enough</div>company_size = “51-200” <strong>OR</strong> “201-500” <strong>OR</strong> “500+”<br><span style="color:var(--muted)">Our hot-lead rule. Also used in the Switch: interest = Demo OR Pricing → sales path.</span></div>
+      <div class="card"><div class="h">AND: all must be true</div>status = “New” <strong>AND</strong> follow_up_date is before tomorrow<br><span style="color:var(--muted)">The daily reminder’s rule in Session 5.</span></div>
+    </div>
+  </div>
+
+  <div class="topic" id="s3-filter">
+    <h3>Filter node</h3>
+    <p>Filter keeps only the items that match and quietly drops the rest. Unlike IF, there is no second branch. We use it to skip test submissions, so a teammate typing “test” into the form doesn’t get emailed to a rep.</p>
+    <div class="canvas">
+      <div class="flow">
+        <div class="n"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div><div class="sub">5 items</div></div>
+        <div class="n l"><div class="ic">🧹</div><div class="lb">Skip test entries</div><div class="sub">name does not contain “test”</div></div>
+        <div class="n l"><div class="ic">🚦</div><div class="lb">Switch</div><div class="sub">4 items</div></div>
+      </div>
+    </div>
+    <p>Use Filter when you don’t care about the items that fail. Use IF when both groups need something done.</p>
+  </div>
+
+  <div class="topic" id="s3-merge">
+    <h3>Merge node</h3>
+    <p>Merge takes data from two paths and combines it into one. Our main workflow doesn’t need it, so here’s a short side example to try.</p>
+    <div class="canvas">
+      <div class="graph" data-edges="a>m,b>m,m>p">
+        <div class="n" data-id="a" style="grid-area:1/1"><div class="ic">📝</div><div class="lb">Form leads</div><div class="sub">Lead Tracker</div></div>
+        <div class="n" data-id="b" style="grid-area:2/1"><div class="ic">🎪</div><div class="lb">Trade show leads</div><div class="sub">another sheet</div></div>
+        <div class="n l" data-id="m" style="grid-area:1/2/3"><div class="ic">🔗</div><div class="lb">Merge</div><div class="sub">append</div></div>
+        <div class="n" data-id="p" style="grid-area:1/3/3"><div class="ic">📋</div><div class="lb">One combined list</div></div>
+      </div>
+      <div class="cap">Side example only. Not added to the Zenroll workflow.</div>
+    </div>
+    <p>Two common modes: <strong>Append</strong> stacks both lists into one (form leads + trade show leads). <strong>Combine → Matching fields</strong> joins rows that share a value, like email, similar to a VLOOKUP in Excel: for example, adding each lead’s deal stage from a CRM export.</p>
+  </div>
+
+  <div class="topic" id="s3-loop">
+    <h3>Loop Over Items</h3>
+    <p>You rarely need to build a loop, because n8n already runs each node once per item. If 20 leads come in, the email node sends 20 emails by itself. That’s why our daily reminder in Session 5 has no loop. The <strong>Loop Over Items</strong> node is for when you want control over how items are processed, most often to handle them in small groups (next topic).</p>
+  </div>
+
+  <div class="topic" id="s3-batch">
+    <h3>Batch processing</h3>
+    <p>Batching means handling items in small groups instead of all at once. Say Zenroll imports 2,000 old leads and wants to email them all. Gmail limits how fast you can send, so you’d send them in batches of 50 with a pause between: Loop Over Items (batch size 50) → Gmail → Wait → back to the loop. Our project doesn’t reach that size, so we don’t build it.</p>
+  </div>
+
+  <div class="topic" id="s3-routing">
+    <h3>Conditional routing</h3>
+    <p>Conditional routing is the general idea behind IF and Switch: sending each item down a different path based on its data. In our project the path is decided by rules we wrote in advance: interest decides the team, company size decides hot or regular.</p>
+  </div>
+
+  <div class="topic" id="s3-branches">
+    <h3>Branches</h3>
+    <p>A branch is one path coming out of an IF, Switch or any node with more than one connection. Branches run independently: the sales branch has several steps (Claude, fit check, hot check, emails), while the support branch has just two (save the route, forward the email).</p>
+  </div>
+
+  <div class="topic" id="s3-rejoin">
+    <h3>Rejoining branches</h3>
+    <p>After splitting, both paths often need to finish with the same step. Hot or regular, every sales lead must get its classification saved in the sheet. Connect both branches into one node:</p>
+    <div class="canvas">
+      <div class="graph" style="--gap:92px" data-edges="i>a:true,i>b:false,a>l,b>l">
+        <div class="n l" data-id="i" style="grid-area:1/1/3"><div class="ic">🔀</div><div class="lb">IF hot lead?</div></div>
+        <div class="n" data-id="a" style="grid-area:1/2"><div class="ic">🔥</div><div class="lb">Mark hot</div><div class="sub">lead_type = Hot</div></div>
+        <div class="n" data-id="b" style="grid-area:2/2"><div class="ic">📨</div><div class="lb">Mark regular</div><div class="sub">lead_type = Regular</div></div>
+        <div class="n" data-id="l" style="grid-area:1/3/3"><div class="ic">📝</div><div class="lb">Save classification</div><div class="sub">update row</div></div>
+      </div>
+      <div class="cap">Every sales lead ends up saved, whichever path it took.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s3-build">
+    <h3>Project build: route and classify</h3>
+    <p>Extend the Lead automation workflow after “Save to Lead Tracker”:</p>
+    <div class="fig">
+      <div class="graph v" data-edges="s>f,f>w,w>su:Support,w>h:Demo / Pricing,w>pa:Partnership,h>ht:true,h>rg:false,ht>c,rg>c">
+        <div class="n" data-id="s" style="grid-area:1/2"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div></div>
+        <div class="n l" data-id="f" style="grid-area:2/2"><div class="ic">🧹</div><div class="lb">Skip test entries</div></div>
+        <div class="n l" data-id="w" style="grid-area:3/2"><div class="ic">🚦</div><div class="lb">Switch on interest</div></div>
+        <div class="n" data-id="su" style="grid-area:4/1"><div class="ic">📝</div><div class="lb">Save route: Support</div></div>
+        <div class="n l" data-id="h" style="grid-area:4/2"><div class="ic">🔀</div><div class="lb">IF hot lead?</div></div>
+        <div class="n" data-id="pa" style="grid-area:4/3"><div class="ic">📝</div><div class="lb">Save route: Partnership</div></div>
+        <div class="n" data-id="ht" style="grid-area:5/1"><div class="ic">🔥</div><div class="lb">Mark hot</div></div>
+        <div class="n" data-id="rg" style="grid-area:5/3"><div class="ic">📨</div><div class="lb">Mark regular</div></div>
+        <div class="n" data-id="c" style="grid-area:6/2"><div class="ic">📝</div><div class="lb">Save classification</div></div>
+      </div>
+    </div>
+    <ol>
+      <li><strong>Filter “Skip test entries”</strong>: <code>name</code> → String → does not contain → <code>test</code> (turn off case sensitivity).</li>
+      <li><strong>Switch</strong> on <code>interest</code>, three rules: Support; Partnership; Demo OR Pricing.</li>
+      <li>Support and Partnership outputs: <strong>Google Sheets → Update row</strong> in Leads, match on <code>lead_id</code>, set <code>route</code> to Support or Partnership. (The emails come in Session 5.)</li>
+      <li>Sales output: <strong>IF hot lead?</strong> with company_size equal to 51-200 OR 201-500 OR 500+.</li>
+      <li><strong>Mark hot</strong> / <strong>Mark regular</strong>: Edit Fields with <strong>Include Other Input Fields</strong> on, adding <code>lead_type</code> = Hot or Regular and <code>route</code> = Sales.</li>
+      <li>Connect both into <strong>Save classification</strong>: Google Sheets → Update row, match on <code>lead_id</code>, Map automatically.</li>
+    </ol>
+    <div class="sheet">
+      <div class="tab"><b>Lead Tracker</b> › Leads (after Session 3)</div>
+      <table>
+        <tr><th class="rn"></th><th>lead_id</th><th>name</th><th>company_size</th><th>interest</th><th class="new">route</th><th class="new">lead_type</th><th>…</th></tr>
+        <tr><td class="rn">2</td><td>L-1002</td><td>Priya Sharma</td><td>51-200</td><td>Demo</td><td class="new">Sales</td><td class="new">Hot</td><td class="empty"></td></tr>
+        <tr><td class="rn">3</td><td>L-1003</td><td>Rahul Verma</td><td>11-50</td><td>Pricing</td><td class="new">Sales</td><td class="new">Regular</td><td class="empty"></td></tr>
+        <tr><td class="rn">4</td><td>L-1004</td><td>Anita Rao</td><td>1-10</td><td>Support</td><td class="new">Support</td><td class="empty"></td><td class="empty"></td></tr>
+        <tr><td class="rn">5</td><td>L-1005</td><td>Karan Mehta</td><td>11-50</td><td>Demo</td><td class="new">Sales</td><td class="new">Regular</td><td class="empty"></td></tr>
+      </table>
+    </div>
+    <p class="sheet-note">Karan shows as Regular for now. In Session 6, Claude notices Zenroll can’t do payroll outside India and marks him “not a fit”.</p>
+  </div>
+</section>
+
+<!-- ================= SESSION 4 ================= -->
+<section class="session" id="s4">
+  <header><div class="num">Session 4</div><h2>APIs, HTTP and webhooks</h2>
+    <div class="prog"><div class="bar"><i></i></div><span class="txt"></span></div></header>
+
+  <div class="topic" id="s4-api">
+    <h3>What is an API</h3>
+    <p>An API is how one app asks another app for something. Think of a restaurant: you don’t walk into the kitchen. You tell the waiter, the waiter tells the kitchen, and the waiter brings your food back. The API is the waiter.</p>
+    <div class="fig">
+      <svg viewBox="0 0 720 200" width="720" role="img" aria-label="API as a waiter between n8n and Google Sheets">
+        <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+        <rect x="20" y="50" width="170" height="90" rx="14" fill="var(--act-bg)" stroke="var(--act)" stroke-width="2"/>
+        <text x="105" y="88" text-anchor="middle" font-size="26">🧑‍💼</text>
+        <text x="105" y="118" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">n8n (you)</text>
+        <rect x="275" y="50" width="170" height="90" rx="14" fill="var(--trig-bg)" stroke="var(--trig)" stroke-width="2"/>
+        <text x="360" y="88" text-anchor="middle" font-size="26">🤵</text>
+        <text x="360" y="118" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">API (waiter)</text>
+        <rect x="530" y="50" width="170" height="90" rx="14" fill="var(--ai-bg)" stroke="var(--ai)" stroke-width="2"/>
+        <text x="615" y="88" text-anchor="middle" font-size="26">📊</text>
+        <text x="615" y="118" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Google Sheets (kitchen)</text>
+        <line x1="190" y1="78" x2="272" y2="78" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar2)"/>
+        <line x1="445" y1="78" x2="527" y2="78" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar2)"/>
+        <line x1="527" y1="112" x2="448" y2="112" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar2)"/>
+        <line x1="272" y1="112" x2="193" y2="112" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar2)"/>
+        <text x="360" y="30" text-anchor="middle" font-size="13" fill="var(--ink2)">request: “add Priya’s row to Leads”</text>
+        <text x="360" y="176" text-anchor="middle" font-size="13" fill="var(--ink2)">response: “done, it’s row 2”</text>
+      </svg>
+    </div>
+    <p>Every Google Sheets and Gmail node you’ve used is really an API call. n8n just hides the details. APIs exist so apps can work together safely: Google doesn’t let outsiders into its servers, but it offers a menu of things you can ask for.</p>
+  </div>
+
+  <div class="topic" id="s4-cs">
+    <h3>Client and server</h3>
+    <p>The <strong>client</strong> asks, and the <strong>server</strong> answers. When “Save to Lead Tracker” runs, n8n is the client and Google Sheets is the server. In the webhook build later, it flips: the salesperson’s browser is the client and n8n is the server.</p>
+  </div>
+
+  <div class="topic" id="s4-req">
+    <h3>Request</h3>
+    <p>A request is the message the client sends. It says where to go (URL), what to do (method), and optionally who you are (headers) and what you’re sending (body).</p>
+  </div>
+
+  <div class="topic" id="s4-res">
+    <h3>Response</h3>
+    <p>A response is what the server sends back: a status code saying how it went, plus the data, usually as JSON. The node’s output panel shows you this response.</p>
+  </div>
+
+  <div class="topic" id="s4-httpc">
+    <h3>HTTP</h3>
+    <p>HTTP is the language requests and responses are written in. Your browser uses it every time you open a website. APIs use the same language, just returning data instead of a web page.</p>
+  </div>
+
+  <div class="topic" id="s4-get">
+    <h3>GET</h3>
+    <p>GET means “read something”. Nothing changes on the server. When the daily reminder in Session 5 reads all rows from the Lead Tracker, that’s a GET behind the scenes. So is a salesperson clicking the “Mark as contacted” link: a browser opening any link sends a GET.</p>
+  </div>
+
+  <div class="topic" id="s4-post">
+    <h3>POST</h3>
+    <p>POST means “create something new”. “Save to Lead Tracker” (append row) is a POST: it creates a new row. Sending an email with the Gmail node is also a POST: it creates a new message.</p>
+  </div>
+
+  <div class="topic" id="s4-put">
+    <h3>PUT</h3>
+    <p>PUT means “replace the whole record”. If you PUT Priya’s lead, every field is replaced with what you send, and anything you leave out is wiped.</p>
+  </div>
+
+  <div class="topic" id="s4-patch">
+    <h3>PATCH</h3>
+    <p>PATCH means “change part of a record”. Changing only Priya’s status from New to Contacted is a PATCH-style change: everything else stays as it was. Most “Update row” actions work this way.</p>
+  </div>
+
+  <div class="topic" id="s4-delete">
+    <h3>DELETE</h3>
+    <p>DELETE means “remove something”. Deleting a spam submission from the Leads tab would be a DELETE. Use it carefully, because it usually can’t be undone.</p>
+  </div>
+
+  <div class="topic" id="s4-url">
+    <h3>URL</h3>
+    <p>The URL is the address of what you’re asking for. Here’s the address of Claude’s API, which we call in this session:</p>
+    <div class="url"><span class="u1">https://api.anthropic.com</span><span class="u2">/v1/messages</span></div>
+    <p style="margin-top:12px">And here’s our “Mark as contacted” webhook link, which has query parameters too:</p>
+    <div class="url"><span class="u1">https://yourname.app.n8n.cloud</span><span class="u2">/webhook/lead-status</span><span class="u3">?lead_id=L-1002&amp;status=Contacted</span></div>
+    <ul class="legend">
+      <li><span class="callout" style="background:var(--trig)">1</span><span>Base URL: which server</span></li>
+      <li><span class="callout" style="background:var(--act)">2</span><span>Path: which thing on that server</span></li>
+      <li><span class="callout" style="background:var(--logic)">3</span><span>Query parameters: extra details</span></li>
+    </ul>
+  </div>
+
+  <div class="topic" id="s4-query">
+    <h3>Query parameters</h3>
+    <p>Query parameters come after the <code>?</code>, in <code>key=value</code> pairs joined by <code>&amp;</code>. In <code>?lead_id=L-1002&amp;status=Contacted</code>, the webhook learns which lead and what status. They work like filters on a shopping site.</p>
+  </div>
+
+  <div class="topic" id="s4-headers">
+    <h3>Headers</h3>
+    <p>Headers are extra details on the outside of the envelope: who’s asking, what format the data is in, and the password. Claude’s API needs three:</p>
+<pre class="code"><code><span class="k">x-api-key</span>: <span class="s">your Claude API key</span>
+<span class="k">anthropic-version</span>: <span class="s">2023-06-01</span>
+<span class="k">content-type</span>: <span class="s">application/json</span></code></pre>
+    <p>When the Google Sheets node calls Google, n8n adds your login as a header automatically. With the HTTP Request node, you add headers yourself.</p>
+  </div>
+
+  <div class="topic" id="s4-body">
+    <h3>Request body</h3>
+    <p>The body is the content inside the envelope, used when you send data (POST, PUT, PATCH). When “Save to Lead Tracker” runs, the body is Priya’s cleaned lead. When we ask Claude a question, the body holds the question. GET requests usually have no body.</p>
+  </div>
+
+  <div class="topic" id="s4-jsonreq">
+    <h3>JSON request</h3>
+    <p>The body we send to Claude’s API, asking it to read Priya’s requirement:</p>
+<pre class="code"><code><span class="p">POST https://api.anthropic.com/v1/messages</span>
+
+<span class="p">{</span>
+  <span class="k">"model"</span>: <span class="s">"claude-sonnet-5"</span>,
+  <span class="k">"max_tokens"</span>: <span class="nm">300</span>,
+  <span class="k">"messages"</span>: <span class="p">[</span>
+    <span class="p">{</span> <span class="k">"role"</span>: <span class="s">"user"</span>, <span class="k">"content"</span>: <span class="s">"In one line, what does this customer need? Payroll and attendance for 120 staff across 3 stores."</span> <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span></code></pre>
+  </div>
+
+  <div class="topic" id="s4-jsonres">
+    <h3>JSON response</h3>
+    <p>Claude’s reply (shortened). The answer text sits inside <code>content[0].text</code>:</p>
+<pre class="code"><code><span class="p">200 OK</span>
+
+<span class="p">{</span>
+  <span class="k">"role"</span>: <span class="s">"assistant"</span>,
+  <span class="k">"content"</span>: <span class="p">[</span>
+    <span class="p">{</span> <span class="k">"type"</span>: <span class="s">"text"</span>, <span class="k">"text"</span>: <span class="s">"A payroll and mobile attendance system for 120 employees at 3 retail locations."</span> <span class="p">}</span>
+  <span class="p">]</span>,
+  <span class="k">"stop_reason"</span>: <span class="s">"end_turn"</span>,
+  <span class="k">"usage"</span>: <span class="p">{</span> <span class="k">"input_tokens"</span>: <span class="nm">31</span>, <span class="k">"output_tokens"</span>: <span class="nm">19</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+    <p>In n8n, the next node reads the answer with <code>{{ $json.content[0].text }}</code>.</p>
+  </div>
+
+  <div class="topic" id="s4-status">
+    <h3>Status codes</h3>
+    <p>A three-digit number that tells you how the request went. The first digit tells the story: 2 = good, 4 = you made a mistake, 5 = the server had a problem.</p>
+    <div class="tbl"><table>
+      <tr><th>Code</th><th>Meaning</th><th>In our project</th></tr>
+      <tr><td><strong style="color:var(--good)">200</strong></td><td>OK</td><td>Claude answered</td></tr>
+      <tr><td><strong style="color:var(--good)">201</strong></td><td>Created</td><td>Something new was saved</td></tr>
+      <tr><td><strong style="color:var(--bad)">400</strong></td><td>Bad request</td><td>The JSON body has a typo or a missing field</td></tr>
+      <tr><td><strong style="color:var(--bad)">401</strong></td><td>Unauthorized</td><td>Wrong Claude API key, or Google login expired</td></tr>
+      <tr><td><strong style="color:var(--bad)">403</strong></td><td>Forbidden</td><td>Your Google account can’t edit that sheet</td></tr>
+      <tr><td><strong style="color:var(--bad)">404</strong></td><td>Not found</td><td>Wrong URL, or the sheet was renamed or deleted</td></tr>
+      <tr><td><strong style="color:var(--bad)">429</strong></td><td>Too many requests</td><td>Calling too fast; wait and retry</td></tr>
+      <tr><td><strong style="color:var(--bad)">500</strong></td><td>Server error</td><td>Their system broke, not you</td></tr>
+    </table></div>
+    <div class="warn">Some APIs reply 200 even when something is wrong and put the problem inside the data. Always look at the data, not just the code.</div>
+  </div>
+
+  <div class="topic" id="s4-auth">
+    <h3>Authentication</h3>
+    <p>Authentication is proving who you are, so Google gives your Lead Tracker only to you. Like showing your ID badge at the office door. When you clicked “Sign in with Google” for the Sheets credential, you authenticated n8n.</p>
+  </div>
+
+  <div class="topic" id="s4-key">
+    <h3>API key</h3>
+    <p>An API key is a long secret code an app gives you, acting as a password for software. Treat it like your bank PIN: never share it in chats or screenshots.</p>
+    <p><strong>Get your Claude API key now:</strong> sign in to the Anthropic Console (<strong>console.anthropic.com</strong>), add a small amount of credit, and create a key. Copy it once; the console won’t show it again. We use it in this session and in Session 6.</p>
+  </div>
+
+  <div class="topic" id="s4-bearer">
+    <h3>Bearer token</h3>
+    <p>A bearer token is a common way of sending that secret in the headers. “Bearer” means “whoever holds this is allowed in”, like a concert ticket. After “Sign in with Google”, n8n gets a token like this and attaches it to every Sheets and Gmail request.</p>
+<pre class="code"><code><span class="k">Authorization</span>: <span class="s">Bearer ya29.a0Af...</span></code></pre>
+  </div>
+
+  <div class="topic" id="s4-http">
+    <h3>HTTP Request node</h3>
+    <p>This node lets n8n talk to <em>any</em> app with an API, even ones without their own n8n node. You fill in the parts you just learned. Let’s call Claude directly, the raw way, so you see that Claude really is just an API:</p>
+    <div class="ndv">
+      <div><div class="h">Input</div>
+        <div class="fld drag"><b>requirement</b><span>Payroll and attendance for 120 staff…</span></div>
+      </div>
+      <div class="mid"><div class="h">HTTP Request: Ask Claude</div>
+        <div class="param"><label>Method</label><div class="in">POST</div></div>
+        <div class="param"><label>URL</label><div class="in">https://api.anthropic.com/v1/messages</div></div>
+        <div class="param"><label>Authentication</label><div class="in">Generic → Header Auth (Name: x-api-key)</div></div>
+        <div class="param"><label>Headers</label><div class="in">anthropic-version: 2023-06-01</div></div>
+        <div class="param"><label>Body (JSON)</label><div class="in">model, max_tokens, messages with <span class="ex">{{ $json.requirement }}</span></div></div>
+      </div>
+      <div><div class="h">Output</div>
+        <div class="fld"><b>content[0].text</b><span>A payroll and mobile attendance…</span></div>
+        <div class="fld"><b>usage.output_tokens</b><span>19</span></div>
+      </div>
+    </div>
+    <div class="task">
+      <div class="h">Try it (practice, not added to the main workflow)</div>
+      <ol style="margin:0;padding-left:20px">
+        <li>New workflow: Manual Trigger → Edit Fields with <code>requirement</code> = Priya’s requirement → HTTP Request.</li>
+        <li>Create a <strong>Header Auth</strong> credential: Name <code>x-api-key</code>, Value your API key.</li>
+        <li>Turn on Send Headers: <code>anthropic-version</code> = <code>2023-06-01</code>.</li>
+        <li>Turn on Send Body, JSON, and paste the body from 4.15, replacing the requirement text with <code>{{ $json.requirement }}</code>.</li>
+        <li>Execute and read Claude’s answer in the output. Then break the key on purpose and see the 401.</li>
+      </ol>
+    </div>
+    <div class="warn">Tip: API docs often show a <strong>cURL</strong> command. In the HTTP Request node, click <strong>Import cURL</strong> and paste it, and n8n fills everything in. In Session 6 we use n8n’s ready-made Claude nodes, which do all of this for you.</div>
+  </div>
+
+  <div class="topic" id="s4-webhook">
+    <h3>What is a webhook</h3>
+    <p>With an API, n8n goes and asks. With a webhook, the other side comes and tells n8n. It’s a doorbell: instead of checking the door every minute, you wait for the ring.</p>
+    <div class="two">
+      <div class="card"><div class="h">Checking (our Sheets Trigger)</div>Every minute, n8n asks Google: “Any new form rows?” That’s why a lead can take up to a minute to arrive.</div>
+      <div class="card"><div class="h">Webhook (they tell you)</div>The moment a salesperson clicks “Mark as contacted”, their browser calls n8n’s address directly. n8n reacts instantly.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s4-wurl">
+    <h3>Webhook URL</h3>
+    <p>When you add a <strong>Webhook</strong> trigger node, n8n gives it its own address, such as <code>https://yourname.app.n8n.cloud/webhook/lead-status</code>. Whatever calls that address starts the workflow as an <strong>incoming request</strong>. The query parameters appear in the output under <code>query</code>, so <code>{{ $json.query.lead_id }}</code> gives L-1002.</p>
+  </div>
+
+  <div class="topic" id="s4-testprod">
+    <h3>Test URL vs production URL</h3>
+    <div class="tbl"><table>
+      <tr><th></th><th>Test URL</th><th>Production URL</th></tr>
+      <tr><td>Looks like</td><td><code>…/webhook-test/lead-status</code></td><td><code>…/webhook/lead-status</code></td></tr>
+      <tr><td>Works when</td><td>You click “Listen for test event”, for one call</td><td>The workflow is active</td></tr>
+      <tr><td>Use for</td><td>Building and checking</td><td>The link inside real alert emails</td></tr>
+    </table></div>
+    <div class="warn">On the laptop setup, the webhook address is <code>localhost</code>, so only your own computer can reach it. On n8n Cloud, anyone with the link can reach it, which is what the alert emails need.</div>
+  </div>
+
+  <div class="topic" id="s4-wres">
+    <h3>Webhook response</h3>
+    <p>Whoever called the webhook waits for an answer. When a salesperson clicks the link, their browser shows whatever n8n sends back. The Webhook node’s <strong>Respond</strong> setting decides when: immediately, when the last node finishes, or through a <strong>Respond to Webhook</strong> node where you choose exactly what to send, like “Lead L-1002 marked as Contacted.”</p>
+  </div>
+
+  <div class="topic" id="s4-build">
+    <h3>Project build: the “Mark as contacted” link</h3>
+    <p>Create a new workflow called <strong>Lead status update</strong>. In Session 5 its link goes into the hot-lead alert email; clicking it updates the lead’s status in the sheet.</p>
+    <div class="canvas">
+      <div class="flow">
+        <div class="n t"><div class="ic">🪝</div><div class="lb">Webhook</div><div class="sub">GET /lead-status</div></div>
+        <div class="n"><div class="ic">📝</div><div class="lb">Update status</div><div class="sub">Sheets: update row</div></div>
+        <div class="n"><div class="ic">↩️</div><div class="lb">Respond to Webhook</div><div class="sub">confirmation text</div></div>
+      </div>
+    </div>
+    <ol>
+      <li><strong>Webhook</strong>: method GET, path <code>lead-status</code>, Respond: “Using ‘Respond to Webhook’ node”.</li>
+      <li><strong>Google Sheets → Update row</strong> in Leads, match on <code>lead_id</code> = <code>{{ $json.query.lead_id }}</code>, set <code>status</code> = <code>{{ $json.query.status }}</code>.</li>
+      <li><strong>Respond to Webhook</strong>: respond with Text: <code>Lead {{ $('Webhook').item.json.query.lead_id }} marked as {{ $('Webhook').item.json.query.status }}.</code></li>
+      <li>Click “Listen for test event”, then open this in a new tab: <code style="word-break:break-all">https://yourname.app.n8n.cloud/webhook-test/lead-status?lead_id=L-1002&amp;status=Contacted</code></li>
+      <li>The browser shows the message, and Priya’s row in the sheet now says Contacted.</li>
+    </ol>
+    <div class="sheet">
+      <div class="tab"><b>Lead Tracker</b> › Leads (after Session 4)</div>
+      <table>
+        <tr><th class="rn"></th><th>lead_id</th><th>name</th><th class="new">status</th><th>route</th><th>lead_type</th><th>…</th></tr>
+        <tr><td class="rn">2</td><td>L-1002</td><td>Priya Sharma</td><td class="new">Contacted</td><td>Sales</td><td>Hot</td><td class="empty"></td></tr>
+        <tr><td class="rn">3</td><td>L-1003</td><td>Rahul Verma</td><td>New</td><td>Sales</td><td>Regular</td><td class="empty"></td></tr>
+      </table>
+    </div>
+    <div class="say">One application just talked to another, in both directions. And you’ve now called Claude through its API: in Session 6 it becomes part of the workflow.</div>
+  </div>
+</section>
+
+<!-- ================= SESSION 5 ================= -->
+<section class="session" id="s5">
+  <header><div class="num">Session 5</div><h2>Going live: emails, schedules and reliability</h2>
+    <div class="prog"><div class="bar"><i></i></div><span class="txt"></span></div></header>
+
+  <div class="topic" id="s5-gmail">
+    <h3>Sending emails with Gmail</h3>
+    <p>The <strong>Gmail → Send a message</strong> node sends an email from your Google account. Connect it with “Sign in with Google”, then fill in To, Subject and Message using expressions. Set <strong>Email Type</strong> to HTML if you want links and bold text.</p>
+    <div class="two">
+      <div class="card"><div class="h">Hot lead → alert the sales inbox</div>
+        <strong>To:</strong> your sales inbox (your own email for now)<br>
+        <strong>Subject:</strong> <code>🔥 Hot lead: {{ $json.company }} ({{ $json.company_size }})</code><br>
+        <strong>Message:</strong> name, phone, email, requirement, timeline, and a link:<br>
+        <code style="word-break:break-all">&lt;a href="https://yourname.app.n8n.cloud/webhook/lead-status?lead_id={{ $json.lead_id }}&amp;status=Contacted"&gt;Mark as contacted&lt;/a&gt;</code>
+      </div>
+      <div class="card"><div class="h">Regular lead → welcome email to the lead</div>
+        <strong>To:</strong> <code>{{ $json.email }}</code><br>
+        <strong>Subject:</strong> <code>Thanks for contacting Zenroll, {{ $json.first_name }}</code><br>
+        <strong>Message:</strong> <code>Hi {{ $json.first_name }}, thanks for your interest in Zenroll. Our team will get back to you by {{ $json.follow_up_date }}.</code>
+      </div>
+    </div>
+    <p>Support and Partnership leads get a simple forward: Gmail to your support or partnerships address with the lead’s details.</p>
+    <div class="warn">While testing, make sure every “To” address is your own email so no real person gets a half-built email.</div>
+  </div>
+
+  <div class="topic" id="s5-schedule">
+    <h3>Schedule Trigger</h3>
+    <p>Starts a workflow at set times, like an alarm clock. Pick an interval (every X minutes, hours or days) or a specific time. We use it for the <strong>daily follow-up reminder</strong>: every weekday at 9 AM, find hot leads still marked New after their follow-up date and remind the sales team.</p>
+    <div class="warn">Check the timezone in the workflow settings so 9 AM means 9 AM India time.</div>
+  </div>
+
+  <div class="topic" id="s5-cron">
+    <h3>Cron / scheduling concept</h3>
+    <p>Cron is a short code for schedules, used everywhere in tech. Five slots: minute, hour, day of month, month, day of week. <code>*</code> means “every”. In the Schedule Trigger, choose <strong>Custom (Cron)</strong> to use one.</p>
+    <div class="tbl"><table>
+      <tr><th>Cron</th><th>Means</th><th>Could be used for</th></tr>
+      <tr><td><code>0 9 * * 1-5</code></td><td>9:00 AM, Monday to Friday</td><td>Our follow-up reminder</td></tr>
+      <tr><td><code>0 17 * * 5</code></td><td>5:00 PM every Friday</td><td>Weekly lead summary to the manager</td></tr>
+      <tr><td><code>*/30 * * * *</code></td><td>Every 30 minutes</td><td>Checking for urgent leads</td></tr>
+      <tr><td><code>0 10 1 * *</code></td><td>10:00 AM on the 1st of every month</td><td>Monthly report</td></tr>
+    </table></div>
+  </div>
+
+  <div class="topic" id="s5-creds">
+    <h3>Credentials management</h3>
+    <p>Credentials are your saved logins for apps. By now the project uses Google Sheets Trigger, Google Sheets and Gmail, plus the Claude key from Session 4. You add each once in the <strong>Credentials</strong> section, and every node can reuse it. n8n stores them encrypted.</p>
+    <ul>
+      <li>Never paste an API key directly into a node field. Always use a credential.</li>
+      <li>Name credentials clearly, such as “Gmail – Zenroll sales”.</li>
+      <li>When you share a workflow, the credentials are not included, which keeps your logins safe.</li>
+      <li>If a Google credential stops working (401 errors), open it and sign in again.</li>
+    </ul>
+  </div>
+
+  <div class="topic" id="s5-activate">
+    <h3>Workflow activation</h3>
+    <p>Once testing works, switch <strong>Lead automation</strong>, <strong>Lead status update</strong> and <strong>Daily follow-up reminder</strong> to active (or publish them). From then on, new form responses, link clicks and 9 AM schedules all run on their own. A Manual Trigger never fires by itself, so it only matters for testing.</p>
+  </div>
+
+  <div class="topic" id="s5-history">
+    <h3>Execution history</h3>
+    <p>The <strong>Executions</strong> tab lists every run: when it ran, how long it took, and whether it succeeded or failed. Click any run to see exactly what data went through each node, like CCTV replay for your workflow. If sales says “we never got the alert for Priya”, this is where you check.</p>
+  </div>
+
+  <div class="topic" id="s5-fail">
+    <h3>Failed executions</h3>
+    <p>When a run fails, the failing node turns red and shows an error message. Everything after it doesn’t run.</p>
+    <div class="canvas">
+      <div class="flow">
+        <div class="n t"><div class="ic">📊</div><div class="lb">Sheets Trigger</div><div class="sub" style="color:var(--good)">✓ 1 item</div></div>
+        <div class="n"><div class="ic">✏️</div><div class="lb">Clean lead</div><div class="sub" style="color:var(--good)">✓</div></div>
+        <div class="n x"><div class="ic">💾</div><div class="lb">Save to Lead Tracker</div><div class="sub" style="color:var(--bad)">Sheet “Leads” not found</div></div>
+        <div class="n" style="opacity:.4"><div class="ic">🚦</div><div class="lb">Switch</div><div class="sub">not run</div></div>
+      </div>
+      <div class="cap">Someone renamed the “Leads” tab to “Leads 2026”.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s5-debug">
+    <h3>Debugging</h3>
+    <ol>
+      <li><strong>Find the red node.</strong> That’s where it broke.</li>
+      <li><strong>Read the error.</strong> The status code tells you a lot: 401 means reconnect the credential, 404 means check the URL or sheet name.</li>
+      <li><strong>Look at its input.</strong> Was the data it needed actually there? Was a field empty or spelled differently, like “City” vs “city”?</li>
+      <li><strong>Fix and run that node alone</strong> with its own play button.</li>
+    </ol>
+    <p>Tip: <strong>pin</strong> the trigger’s output (the pin icon in its output panel). The workflow reuses Priya’s saved data while you test, so you don’t need to submit the form again every time.</p>
+    <div class="task"><div class="h">Practice</div>Rename the Leads tab, run the workflow, find the error in Executions, then rename it back and re-run.</div>
+  </div>
+
+  <div class="topic" id="s5-missing">
+    <h3>Handling missing data</h3>
+    <p>Form data is messy. The simplest protection happens before n8n: in the Google Form, every question is <strong>Required</strong>, and Work email uses <strong>response validation</strong> so “abc” isn’t accepted. Stopping bad data at the door is far easier than fixing it later.</p>
+    <p>Even so, always give a fallback in expressions for anything a later node depends on, in case a field arrives blank some other way (a resubmitted or edited response, for example):</p>
+<pre class="code"><code><span class="ex">{{ $json.requirement || 'No requirement given' }}</span></code></pre>
+    <p>Read it as: “use the requirement, or if it’s empty, use this text instead”. Put this in Clean lead so later nodes (and Claude in Session 6) never receive a blank.</p>
+  </div>
+
+  <div class="topic" id="s5-apifail">
+    <h3>Handling API failures</h3>
+    <p>Every node has a <strong>Settings</strong> tab with two useful options:</p>
+    <ul>
+      <li><strong>Retry On Fail</strong>: try again a few times, with a wait in between. Turn this on for the Gmail nodes and, in Session 6, the Claude nodes, since servers are sometimes briefly busy.</li>
+      <li><strong>On Error</strong>: what to do if it still fails. <em>Stop workflow</em> (default) ends the run and shows it as failed in Executions. <em>Continue</em> skips the problem and carries on. <em>Continue (using error output)</em> sends failed items out of an extra error branch, where you could, for example, email yourself about it.</li>
+    </ul>
+    <p>For this project, Retry On Fail plus the default Stop is enough: a failed lead shows up red in Executions, and you can see exactly what went wrong.</p>
+  </div>
+
+  <div class="topic" id="s5-capstone">
+    <h3>Capstone workflow build: emails and the daily reminder</h3>
+    <p><strong>Part A: complete Lead automation.</strong> Add emails after “Save classification” and on the Support and Partnership paths.</p>
+    <div class="fig">
+      <div class="graph v" data-edges="t>c,c>s,s>w,w>su:Support,w>h:Demo / Pricing,w>pa:Partnership,h>ht:true,h>rg:false,ht>sc,rg>sc,sc>ih,ih>er:Hot,ih>we:Regular,er>es,we>es">
+        <div class="n t" data-id="t" style="grid-area:1/2"><div class="ic">📊</div><div class="lb">Sheets Trigger</div></div>
+        <div class="n" data-id="c" style="grid-area:2/2"><div class="ic">✏️</div><div class="lb">Clean lead</div></div>
+        <div class="n" data-id="s" style="grid-area:3/2"><div class="ic">💾</div><div class="lb">Save + skip tests</div></div>
+        <div class="n l" data-id="w" style="grid-area:4/2"><div class="ic">🚦</div><div class="lb">Switch</div></div>
+        <div class="n" data-id="su" style="grid-area:5/1"><div class="ic">🎧</div><div class="lb">Save route + email support</div></div>
+        <div class="n l" data-id="h" style="grid-area:5/2"><div class="ic">🔀</div><div class="lb">IF hot lead?</div></div>
+        <div class="n" data-id="pa" style="grid-area:5/3"><div class="ic">🤝</div><div class="lb">Save route + email partnerships</div></div>
+        <div class="n" data-id="ht" style="grid-area:6/1"><div class="ic">🔥</div><div class="lb">Mark hot</div></div>
+        <div class="n" data-id="rg" style="grid-area:6/3"><div class="ic">📨</div><div class="lb">Mark regular</div></div>
+        <div class="n" data-id="sc" style="grid-area:7/2"><div class="ic">📝</div><div class="lb">Save classification</div></div>
+        <div class="n l" data-id="ih" style="grid-area:8/2"><div class="ic">🚦</div><div class="lb">Switch on lead_type</div></div>
+        <div class="n" data-id="er" style="grid-area:9/1"><div class="ic">🔥</div><div class="lb">Gmail: alert sales inbox</div></div>
+        <div class="n" data-id="we" style="grid-area:9/3"><div class="ic">👋</div><div class="lb">Gmail: welcome email</div></div>
+        <div class="n" data-id="es" style="grid-area:10/2"><div class="ic">📝</div><div class="lb">Mark email sent</div></div>
+      </div>
+    </div>
+    <ol>
+      <li>After Save classification, add a <strong>Switch on lead_type</strong> with two rules, Hot and Regular (in Session 6 a third one, “Not a fit”, joins). Connect each to its Gmail node from 5.1. Turn on Retry On Fail for both.</li>
+      <li>Connect both Gmail nodes into <strong>Mark email sent</strong> (Update row): <code>lead_id</code> = <code>{{ $('Save classification').item.json.lead_id }}</code>, <code>email_sent</code> = Yes, <code>email_sent_at</code> = <code>{{ $now.toFormat('dd/MM/yyyy HH:mm') }}</code>.</li>
+      <li>Add Gmail forwards on the Support and Partnership paths after their “Save route” nodes.</li>
+      <li>Test with all four leads. Then activate.</li>
+      <li>Submit a fresh response to the real form, wait a minute, and watch it flow: the email arrives and the sheet updates. Click “Mark as contacted” in the alert email.</li>
+    </ol>
+
+    <p style="margin-top:18px"><strong>Part B: Daily follow-up reminder.</strong> New workflow:</p>
+    <div class="canvas">
+      <div class="flow">
+        <div class="n t"><div class="ic">⏰</div><div class="lb">Schedule</div><div class="sub">0 9 * * 1-5</div></div>
+        <div class="n"><div class="ic">📊</div><div class="lb">Get all leads</div><div class="sub">Sheets: get rows</div></div>
+        <div class="n l"><div class="ic">🧹</div><div class="lb">Filter overdue</div><div class="sub">hot, New, follow-up due</div></div>
+        <div class="n"><div class="ic">✉️</div><div class="lb">Reminder email</div><div class="sub">one per lead</div></div>
+      </div>
+    </div>
+    <ul>
+      <li>Filter (AND): <code>lead_type</code> is equal to Hot; <code>status</code> is equal to New; <code>follow_up_date</code> (Date &amp; Time) is before <code>{{ $today.plus({ days: 1 }) }}</code>.</li>
+      <li>Reminder email to the sales inbox: “Reminder: {{ $json.name }} from {{ $json.company }} has been waiting since {{ $json.received_at }}.” Include the Mark as contacted link.</li>
+      <li>No loop needed: if three leads are overdue, the Gmail node sends three reminders by itself.</li>
+    </ul>
+    <div class="sheet">
+      <div class="tab"><b>Lead Tracker</b> › Leads (after Session 5)</div>
+      <table>
+        <tr><th class="rn"></th><th>lead_id</th><th>name</th><th>status</th><th>route</th><th>lead_type</th><th class="new">email_sent</th><th class="new">email_sent_at</th><th>…</th></tr>
+        <tr><td class="rn">2</td><td>L-1002</td><td>Priya Sharma</td><td>Contacted</td><td>Sales</td><td>Hot</td><td class="new">Yes</td><td class="new">27/09/2026 10:16</td><td class="empty"></td></tr>
+        <tr><td class="rn">3</td><td>L-1003</td><td>Rahul Verma</td><td>New</td><td>Sales</td><td>Regular</td><td class="new">Yes</td><td class="new">27/09/2026 10:23</td><td class="empty"></td></tr>
+      </table>
+    </div>
+    <div class="task">
+      <div class="h">Stretch goal</div>
+      Sub-workflows: several nodes update rows in Leads. Build a small workflow “Update lead” that starts with an <strong>Execute Workflow Trigger</strong>, and call it from the main workflow with the <strong>Execute Workflow</strong> node. That way a common job is built once and reused. Real teams also keep a test copy and a live copy of workflows with different credentials.
+    </div>
+  </div>
+</section>
+
+<!-- ================= SESSION 6 ================= -->
+<section class="session" id="s6">
+  <header><div class="num">Session 6</div><h2>AI, LLMs and agents in n8n</h2>
+    <div class="prog"><div class="bar"><i></i></div><span class="txt"></span></div></header>
+
+  <div class="topic" id="s6-ai">
+    <h3>What is AI</h3>
+    <p>AI is software that does tasks we used to think needed a human: understanding language, recognizing images, making judgments. Most modern AI learns patterns from huge numbers of examples instead of following hand-written rules. That learning is called <strong>machine learning</strong>.</p>
+    <p>Our workflow so far follows hand-written rules (“51-200 means hot”). It can’t read Karan’s requirement and notice Zenroll doesn’t do payroll in Dubai, or read Priya’s requirement and notice she means “this week”. AI can.</p>
+  </div>
+
+  <div class="topic" id="s6-genai">
+    <h3>Generative AI</h3>
+    <p>Generative AI creates new content: text, images, code. Writing a personal reply to Priya about her 3 stores is generative AI.</p>
+  </div>
+
+  <div class="topic" id="s6-llm">
+    <h3>LLM</h3>
+    <p>A Large Language Model is a generative AI trained on a massive amount of text. It works by predicting the most fitting next words. Claude is an LLM. So are GPT and Gemini.</p>
+  </div>
+
+  <div class="topic" id="s6-prompt">
+    <h3>Prompt</h3>
+    <p>A prompt is the instruction you give the model. Better briefing, better result, just like briefing a new sales intern.</p>
+    <div class="two">
+      <div class="card"><div class="h" style="color:var(--bad)">Vague</div>“Read this lead.”</div>
+      <div class="card"><div class="h" style="color:var(--good)">Clear</div>“Read this inbound lead. Say what they want, how urgent it is (high, medium, low), whether Zenroll can meet their requirement (yes, partial, no) and why, and summarise it in one line for the sales team.”</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s6-system">
+    <h3>System instructions</h3>
+    <p>System instructions are the standing rules the model follows every time: its role, what it knows, and its limits. Like a job description plus a product briefing. Ours is the <a href="#zenroll-prompt">Zenroll product description</a> from the project section: what Zenroll does, what it doesn’t, the list prices, and rules like “never offer discounts”.</p>
+    <p>That’s how Claude can judge fit. It has never heard of Zenroll; everything it knows about the product comes from these instructions.</p>
+  </div>
+
+  <div class="topic" id="s6-user">
+    <h3>User input</h3>
+    <p>User input is the actual content for this run. In our workflow, it’s each lead’s details, requirement and timeline. The system instructions stay the same; the user input changes for Priya, Rahul, Karan and every lead after.</p>
+  </div>
+
+  <div class="topic" id="s6-resp">
+    <h3>Model response</h3>
+    <p>The model’s answer. In n8n it arrives as JSON output like any other node, ready to be mapped into an email or a sheet column.</p>
+  </div>
+
+  <div class="topic" id="s6-tokens">
+    <h3>Tokens</h3>
+    <p>Models read and write text in small pieces called tokens, roughly ¾ of a word in English. Pricing and limits are counted in tokens. Reading one lead and drafting a reply is a few hundred tokens, a tiny cost per lead.</p>
+  </div>
+
+  <div class="topic" id="s6-context">
+    <h3>Context</h3>
+    <p>Context is everything the model can see when answering: the system instructions, the conversation so far, and any data you pass in. Claude only knows about Priya because we put her details in the prompt. It can’t see the Lead Tracker unless we give it the data or a tool.</p>
+  </div>
+
+  <div class="topic" id="s6-temp">
+    <h3>Temperature / model settings</h3>
+    <p>Temperature controls how creative versus predictable the answers are. Low (near 0) gives consistent answers, which suits sorting leads into urgency levels. Higher gives more variety, which suits brainstorming email subject lines. Other settings include which model to use and the maximum length of the answer.</p>
+  </div>
+
+  <div class="topic" id="s6-halluc">
+    <h3>Hallucination</h3>
+    <p>Sometimes a model states something false with full confidence, like inventing a price or a feature in a reply to Rahul. It’s predicting plausible words, not checking facts. Reduce it by giving real data in the context, telling it what not to do (“never promise prices”), and checking important outputs before they go to customers.</p>
+  </div>
+
+  <div class="topic" id="s6-struct">
+    <h3>Structured output</h3>
+    <p>Instead of free text, ask the model to answer in a fixed JSON shape. Then n8n can use each field in later nodes: an IF on <code>fit</code>, an IF on <code>urgency</code>, a sheet column for <code>summary</code>.</p>
+    <div class="two">
+      <div class="card"><div class="h">Karan’s lead in</div><strong>Requirement:</strong> “Payroll for our team in Dubai and the US.”<br><strong>Timeline:</strong> “Immediately / this week”</div>
+<pre class="code" style="margin:0"><code><span class="p">{</span>
+  <span class="k">"intent"</span>: <span class="s">"Demo request"</span>,
+  <span class="k">"urgency"</span>: <span class="s">"medium"</span>,
+  <span class="k">"fit"</span>: <span class="s">"no"</span>,
+  <span class="k">"fit_reason"</span>: <span class="s">"Zenroll only runs payroll for employees in India."</span>,
+  <span class="k">"summary"</span>: <span class="s">"Wants payroll for Dubai and US teams, quickly."</span>
+<span class="p">}</span></code></pre>
+    </div>
+    <p>In n8n, turn on <strong>Require Specific Output Format</strong> and attach a <strong>Structured Output Parser</strong> with an example like the one above.</p>
+  </div>
+
+  <div class="topic" id="s6-claude">
+    <h3>Connecting Claude model node</h3>
+    <p>Claude goes on the sales path, right after the Switch. It reads each sales lead and adds intent, urgency, fit and a summary. Then two IF nodes use its answer.</p>
+    <div class="fig">
+      <div class="graph v" data-edges="w>c,c>a,a>f,f>h:yes / partial,f>nf:no,h>ht:true,h>rg:false,ht>sc,rg>sc,nf>sc">
+        <div class="n l" data-id="w" style="grid-area:1/2"><div class="ic">🚦</div><div class="lb">Switch: sales path</div></div>
+        <div class="n ai" data-id="c" style="grid-area:2/2"><div class="ic">🧠</div><div class="lb">Claude reads the lead</div><div class="sub">Basic LLM Chain</div></div>
+        <div class="n" data-id="a" style="grid-area:3/2"><div class="ic">✏️</div><div class="lb">Add AI fields</div></div>
+        <div class="n l" data-id="f" style="grid-area:4/2"><div class="ic">🔀</div><div class="lb">IF we can help?</div><div class="sub">fit is not “no”</div></div>
+        <div class="n l" data-id="h" style="grid-area:5/2"><div class="ic">🔀</div><div class="lb">IF hot lead?</div></div>
+        <div class="n" data-id="nf" style="grid-area:5/3"><div class="ic">🙏</div><div class="lb">Mark not a fit</div></div>
+        <div class="n" data-id="ht" style="grid-area:6/1"><div class="ic">🔥</div><div class="lb">Mark hot</div></div>
+        <div class="n" data-id="rg" style="grid-area:6/2"><div class="ic">📨</div><div class="lb">Mark regular</div></div>
+        <div class="n" data-id="sc" style="grid-area:7/2"><div class="ic">📝</div><div class="lb">Save classification</div></div>
+      </div>
+    </div>
+    <ol>
+      <li>In n8n, add a credential of type <strong>Anthropic</strong> and paste your API key from Session 4.</li>
+      <li>Between the Switch’s sales output and IF hot lead?, add a <strong>Basic LLM Chain</strong> node named “Claude reads the lead”.</li>
+      <li>Prompt: <code>Lead: {{ $json.name }} from {{ $json.company }} ({{ $json.company_size }} employees), interested in {{ $json.interest }}. Requirement: {{ $json.requirement }}. Timeline: {{ $json.timeline }}. Return intent, urgency (high/medium/low), fit (yes/partial/no), fit_reason and a one-line summary.</code></li>
+      <li>Add a system message and paste the <a href="#zenroll-prompt">Zenroll product description</a>.</li>
+      <li>Click its <strong>Model</strong> connector and attach <strong>Anthropic Chat Model</strong>. Choose a Claude model and set a low temperature.</li>
+      <li>Turn on Require Specific Output Format and attach the <strong>Structured Output Parser</strong> with the example from 6.12.</li>
+      <li>Claude’s output only contains its answer, not the lead. Add an Edit Fields node “Add AI fields” and bring both together: drag <code>lead_id</code>, <code>name</code>, <code>first_name</code>, <code>email</code>, <code>company</code>, <code>company_size</code>, <code>requirement</code>, <code>timeline</code>, <code>follow_up_date</code> from the <strong>Clean lead</strong> node in the input panel (this uses <code>$('Clean lead')</code>, from 2.14), and add <code>ai_intent</code> = <code>{{ $json.output.intent }}</code>, <code>ai_urgency</code>, <code>ai_fit</code>, <code>ai_fit_reason</code>, <code>ai_summary</code> the same way.</li>
+      <li>Add <strong>IF we can help?</strong>: <code>ai_fit</code> is not equal to <code>no</code>. False → <strong>Mark not a fit</strong> (Edit Fields, Include Other Input Fields on, <code>lead_type</code> = Not a fit, <code>route</code> = Sales) → Save classification.</li>
+      <li>True → your existing <strong>IF hot lead?</strong>. Add one more OR condition: <code>ai_urgency</code> is equal to <code>high</code>. Now a small company that needs something urgently is hot too.</li>
+      <li>In the <strong>Switch on lead_type</strong> from Session 5, add a third rule, <code>Not a fit</code> → Gmail to the lead: <code>Hi {{ $json.first_name }}, thanks for considering Zenroll. Based on what you’ve shared, we may not be the right fit right now, but we’ll reach out if that changes.</code></li>
+    </ol>
+    <div class="say">Prompt + context + model = response.</div>
+    <div class="sheet">
+      <div class="tab"><b>Lead Tracker</b> › Leads (after this step)</div>
+      <table>
+        <tr><th class="rn"></th><th>lead_id</th><th>name</th><th>lead_type</th><th class="new">ai_intent</th><th class="new">ai_urgency</th><th class="new">ai_fit</th><th class="new">ai_fit_reason</th><th class="new">ai_summary</th></tr>
+        <tr><td class="rn">2</td><td>L-1002</td><td>Priya Sharma</td><td>Hot</td><td class="new">Demo request</td><td class="new">high</td><td class="new">yes</td><td class="new">Payroll + GPS attendance, multi-store: Growth plan</td><td class="new">120 staff, 3 stores, demo this week</td></tr>
+        <tr><td class="rn">3</td><td>L-1003</td><td>Rahul Verma</td><td>Regular</td><td class="new">Pricing enquiry</td><td class="new">low</td><td class="new">partial</td><td class="new">Payroll yes; no applicant tracking</td><td class="new">35 staff, comparing options for later</td></tr>
+        <tr><td class="rn">5</td><td>L-1005</td><td>Karan Mehta</td><td>Not a fit</td><td class="new">Demo request</td><td class="new">medium</td><td class="new">no</td><td class="new">Payroll only for employees in India</td><td class="new">Wants Dubai and US payroll</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="topic" id="s6-agent">
+    <h3>AI Agent node</h3>
+    <p>The Basic LLM Chain only reads and writes an answer. The <strong>AI Agent</strong> node can also <em>do things</em> by using tools, and it decides by itself how and when to use them.</p>
+    <p>In our project, the agent handles hot leads. Instead of a template, it writes Priya a personal reply that speaks to her 3 stores and phone attendance, and saves it as a <strong>Gmail draft</strong>. A salesperson checks it and clicks send.</p>
+    <p>It has connectors underneath for its parts: <strong>Chat Model</strong> (the brain, Claude), <strong>Memory</strong> (for chats that go back and forth; we don’t need it for a one-off task like this) and <strong>Tools</strong> (the things it can use).</p>
+    <div class="canvas">
+      <div class="graph" style="row-gap:50px" data-edges="w>a,a>al,a~m,a~g">
+        <div class="n l" data-id="w" style="grid-area:1/1"><div class="ic">🚦</div><div class="lb">Switch: Hot</div></div>
+        <div class="n ai" data-id="a" style="grid-area:1/2"><div class="ic">🤖</div><div class="lb">AI Agent: Draft reply</div></div>
+        <div class="n" data-id="al" style="grid-area:1/4"><div class="ic">🔥</div><div class="lb">Gmail: alert sales inbox</div></div>
+        <div class="n ai" data-id="m" style="grid-area:2/2"><div class="ic">🧠</div><div class="lb">Anthropic Chat Model</div><div class="sub">model</div></div>
+        <div class="n ai" data-id="g" style="grid-area:2/3"><div class="ic">✉️</div><div class="lb">Gmail: create draft</div><div class="sub">tool</div></div>
+      </div>
+      <div class="cap">The agent sits on the Hot branch, before the alert email. The model and the tool plug into its connectors underneath.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s6-tools">
+    <h3>Tools</h3>
+    <p>A tool is a capability you give the AI. On its own, Claude can only write text. With the Gmail draft tool, it can actually put an email in your Drafts folder.</p>
+    <div class="tbl"><table>
+      <tr><th>Tool</th><th>n8n node</th><th>Description (what Claude reads)</th></tr>
+      <tr><td>Create Gmail draft</td><td>Gmail Tool: Draft → Create</td><td>“Saves an email as a draft in the Zenroll sales Gmail. It does not send. Use it once, to save your reply to the lead.”</td></tr>
+    </table></div>
+    <p>In the tool node, set To, Subject and Message to <strong>“Let the model define this”</strong> (the ✨ button next to each field). Claude fills them in when it calls the tool. The description tells the model when and how to use the tool, so write it clearly. A draft tool is safer than a send tool: a person still checks before anything reaches a customer.</p>
+  </div>
+
+  <div class="topic" id="s6-toolcall">
+    <h3>Tool call</h3>
+    <p>When Claude decides it’s ready to use the tool, it makes a tool call: “create draft, To: priya@brightpath.in, Subject: …, Message: …”. n8n runs the Gmail node with those values.</p>
+    <div class="fig">
+      <svg viewBox="0 0 720 250" width="720" role="img" aria-label="Agent tool loop for drafting a reply">
+        <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+        <rect x="10" y="88" width="140" height="74" rx="12" fill="var(--act-bg)" stroke="var(--act)" stroke-width="2"/>
+        <text x="80" y="114" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Priya’s lead</text>
+        <text x="80" y="133" text-anchor="middle" font-size="11" fill="var(--ink2)">hot, good fit,</text>
+        <text x="80" y="148" text-anchor="middle" font-size="11" fill="var(--ink2)">wants a demo</text>
+        <rect x="215" y="95" width="120" height="60" rx="12" fill="var(--ai-bg)" stroke="var(--ai)" stroke-width="2"/>
+        <text x="275" y="130" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Claude</text>
+        <rect x="410" y="20" width="140" height="56" rx="12" fill="var(--trig-bg)" stroke="var(--trig)" stroke-width="2"/>
+        <text x="480" y="46" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Create Gmail draft</text>
+        <text x="480" y="63" text-anchor="middle" font-size="11.5" fill="var(--ink2)">tool in n8n</text>
+        <rect x="590" y="20" width="115" height="56" rx="12" fill="var(--paper)" stroke="var(--muted)" stroke-width="2"/>
+        <text x="647" y="52" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Gmail Drafts</text>
+        <rect x="400" y="172" width="170" height="60" rx="12" fill="var(--good-bg)" stroke="var(--good)" stroke-width="2"/>
+        <text x="485" y="198" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Final response</text>
+        <text x="485" y="216" text-anchor="middle" font-size="11" fill="var(--ink2)">“Draft saved for Priya”</text>
+        <line x1="150" y1="125" x2="212" y2="125" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar3)"/>
+        <path d="M300 95 C 320 50, 360 42, 407 42" fill="none" stroke="var(--ai)" stroke-width="2" marker-end="url(#ar3)"/>
+        <text x="326" y="44" font-size="11.5" fill="var(--ai)" font-weight="600">1 tool call</text>
+        <line x1="550" y1="48" x2="587" y2="48" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar3)"/>
+        <path d="M430 76 C 400 110, 360 115, 338 118" fill="none" stroke="var(--trig)" stroke-width="2" marker-end="url(#ar3)"/>
+        <text x="372" y="96" font-size="11.5" fill="var(--trig)" font-weight="600">2 result</text>
+        <path d="M300 155 C 320 195, 350 202, 397 202" fill="none" stroke="var(--good)" stroke-width="2" marker-end="url(#ar3)"/>
+        <text x="318" y="196" font-size="11.5" fill="var(--good)" font-weight="600">3 answer</text>
+      </svg>
+      <div class="cap">Claude writes the reply, calls the tool to save it, reads the result, then reports back.</div>
+    </div>
+  </div>
+
+  <div class="topic" id="s6-toolres">
+    <h3>Tool result</h3>
+    <p>The tool’s output (the new draft’s ID and labels) goes back to Claude. Claude reads it like a colleague saying “done, it’s in Drafts”. If the tool had failed, Claude would see the error and could try again or report the problem.</p>
+  </div>
+
+  <div class="topic" id="s6-final">
+    <h3>Final response</h3>
+    <p>Once the tool has done its job, Claude writes a short final message, such as “Draft saved for Priya Sharma (priya@brightpath.in), subject: Your Zenroll demo for BrightPath’s 3 stores.” This becomes the agent node’s output.</p>
+    <div class="task">
+      <div class="h">Build it</div>
+      <ol style="margin:0;padding-left:20px">
+        <li>On the <strong>Hot</strong> output of “Switch on lead_type”, insert an <strong>AI Agent</strong> node named “Draft reply”, before the alert email.</li>
+        <li>Prompt source: <strong>Define below</strong>. Prompt: <code>Write a short, personal reply to this hot lead and save it as a Gmail draft. Lead: {{ $json.name }}, {{ $json.company }}, {{ $json.company_size }} employees. Requirement: {{ $json.requirement }}. Summary: {{ $json.ai_summary }}. Send to: {{ $json.email }}. Suggest the right Zenroll plan and offer two demo slots this week.</code></li>
+        <li>System message: paste the <a href="#zenroll-prompt">Zenroll product description</a>, then add “Only save drafts. Never say an email was sent.”</li>
+        <li>Attach <strong>Anthropic Chat Model</strong> and the <strong>Gmail: create draft</strong> tool from 6.15.</li>
+        <li>The agent’s output replaces the lead data, so in the alert email use <code>{{ $('Switch on lead_type').item.json.company }}</code> style references, and add the line “A reply draft is waiting in Gmail Drafts.”</li>
+        <li>Update <strong>Mark email sent</strong> to also set <code>draft_created</code> = Yes for hot leads.</li>
+        <li>Run Priya’s lead. Open Gmail Drafts: a personal reply mentioning her 3 stores and phone attendance is waiting. Open the agent’s logs to see the tool call.</li>
+      </ol>
+    </div>
+    <div class="sheet">
+      <div class="tab"><b>Lead Tracker</b> › Leads (final)</div>
+      <table>
+        <tr><th class="rn"></th><th>lead_id</th><th>name</th><th>route</th><th>lead_type</th><th>ai_fit</th><th class="new">draft_created</th><th>email_sent</th><th>status</th></tr>
+        <tr><td class="rn">2</td><td>L-1002</td><td>Priya Sharma</td><td>Sales</td><td>Hot</td><td>yes</td><td class="new">Yes</td><td>Yes</td><td>Contacted</td></tr>
+        <tr><td class="rn">3</td><td>L-1003</td><td>Rahul Verma</td><td>Sales</td><td>Regular</td><td>partial</td><td class="empty"></td><td>Yes</td><td>New</td></tr>
+        <tr><td class="rn">4</td><td>L-1004</td><td>Anita Rao</td><td>Support</td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td>Yes</td><td>New</td></tr>
+        <tr><td class="rn">5</td><td>L-1005</td><td>Karan Mehta</td><td>Sales</td><td>Not a fit</td><td>no</td><td class="empty"></td><td>Yes</td><td>New</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="topic" id="s6-vs">
+    <h3>Workflow vs Agent</h3>
+    <div class="fig">
+      <svg viewBox="0 0 720 260" width="720" role="img" aria-label="Lead workflow compared with the draft-reply agent">
+        <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+        <text x="170" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Lead workflow: you define the path</text>
+        <g font-size="13" fill="var(--ink)" text-anchor="middle">
+          <rect x="100" y="38" width="140" height="34" rx="9" fill="var(--trig-bg)" stroke="var(--trig)" stroke-width="1.5"/><text x="170" y="60">Form submitted</text>
+          <rect x="100" y="92" width="140" height="34" rx="9" fill="var(--act-bg)" stroke="var(--act)" stroke-width="1.5"/><text x="170" y="114">Save + route</text>
+          <rect x="100" y="146" width="140" height="34" rx="9" fill="var(--act-bg)" stroke="var(--act)" stroke-width="1.5"/><text x="170" y="168">IF fit, IF hot</text>
+          <rect x="100" y="200" width="140" height="34" rx="9" fill="var(--act-bg)" stroke="var(--act)" stroke-width="1.5"/><text x="170" y="222">Send email</text>
+        </g>
+        <line x1="170" y1="72" x2="170" y2="90" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar4)"/>
+        <line x1="170" y1="126" x2="170" y2="144" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar4)"/>
+        <line x1="170" y1="180" x2="170" y2="198" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar4)"/>
+        <line x1="360" y1="30" x2="360" y2="245" stroke="var(--line)" stroke-width="2" stroke-dasharray="5 5"/>
+        <text x="545" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Draft-reply agent: Claude decides</text>
+        <g font-size="13" fill="var(--ink)" text-anchor="middle">
+          <rect x="380" y="120" width="80" height="34" rx="9" fill="var(--act-bg)" stroke="var(--act)" stroke-width="1.5"/><text x="420" y="142">Hot lead</text>
+          <rect x="485" y="115" width="90" height="44" rx="11" fill="var(--ai-bg)" stroke="var(--ai)" stroke-width="2"/><text x="530" y="142" font-weight="700">Claude</text>
+          <rect x="600" y="56" width="115" height="30" rx="8" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.5"/><text x="657" y="76">What to write</text>
+          <rect x="600" y="122" width="115" height="30" rx="8" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.5"/><text x="657" y="142">Which plan</text>
+          <rect x="600" y="188" width="115" height="30" rx="8" fill="var(--trig-bg)" stroke="var(--trig)" stroke-width="1.5"/><text x="657" y="208">When to call tool</text>
+        </g>
+        <line x1="460" y1="137" x2="482" y2="137" stroke="var(--muted)" stroke-width="2" marker-end="url(#ar4)"/>
+        <g stroke="var(--ai)" stroke-width="1.5" fill="none" stroke-dasharray="4 3">
+          <path d="M575 128 L597 72"/><path d="M575 137 L597 137"/><path d="M575 146 L597 202"/>
+        </g>
+      </svg>
+    </div>
+    <div class="two">
+      <div class="card"><div class="h">Workflow</div>Same steps every time, in the order you set. Predictable and cheap. Right for the lead pipeline, because every lead should be saved, routed and checked the same way.</div>
+      <div class="card"><div class="h">Agent</div>The model reads the situation and decides what to do and when to use its tools. Flexible. Right for writing a reply, because every hot lead needs a different message.</div>
+    </div>
+    <p>Our project uses both: a workflow for the process, with an agent inside it for the one step that needs judgment.</p>
+    <div class="say">A workflow follows rules we define. An agent decides which action or tool to use based on the situation.</div>
+  </div>
+
+  <div class="topic" id="s6-blocks">
+    <h3>Agent building blocks</h3>
+    <p>Every agent, in n8n or built directly with Claude, is made of the same parts. Here they are in our Draft reply agent. These carry straight into the Claude Architect material.</p>
+    <div class="blocks">
+      <div class="card"><div class="h">Model</div><p>The brain that reasons and writes: Claude.</p></div>
+      <div class="card"><div class="h">Instructions</div><p>The Zenroll product description plus “only save drafts”.</p></div>
+      <div class="card"><div class="h">Tools</div><p>Create Gmail draft.</p></div>
+      <div class="card"><div class="h">Context</div><p>Priya’s lead details, requirement and Claude’s summary.</p></div>
+      <div class="card"><div class="h">Memory</div><p>Not needed for a one-off task; used in chat assistants.</p></div>
+      <div class="card"><div class="h">State</div><p>Where the task stands: reply written, draft saved or not.</p></div>
+      <div class="card"><div class="h">Decision-making</div><p>Which plan to suggest, what to say, when to call the tool.</p></div>
+      <div class="card"><div class="h">Tool execution</div><p>n8n actually creates the draft in Gmail.</p></div>
+      <div class="card"><div class="h">Observation</div><p>Claude reads the tool result: draft saved.</p></div>
+      <div class="card"><div class="h">Final response</div><p>“Draft saved for Priya”, passed on to the alert email.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>n8n foundations course. Screens and menu names can shift slightly between n8n versions.</footer>
+</main>
+
+<script>
+(function(){
+var NS="http://www.w3.org/2000/svg";
+function mk(t){return document.createElementNS(NS,t);}
+function draw(){
+  document.querySelectorAll('.graph').forEach(function(g,gi){
+    var svg=g.querySelector('svg.edges');
+    if(!svg){svg=mk('svg');svg.setAttribute('class','edges');g.insertBefore(svg,g.firstChild);}
+    var mid='gh'+gi;
+    svg.innerHTML='<defs><marker id="'+mid+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>';
+    var R=g.getBoundingClientRect(), vert=g.classList.contains('v');
+    svg.setAttribute('width',R.width);svg.setAttribute('height',R.height);
+    (g.dataset.edges||'').split(',').forEach(function(e){
+      e=e.trim(); if(!e) return;
+      var soft=e.indexOf('~')>-1, ci=e.indexOf(':'), label=ci>-1?e.slice(ci+1):'', pair=ci>-1?e.slice(0,ci):e;
+      var ab=pair.split(soft?'~':'>');
+      var A=g.querySelector('[data-id="'+ab[0]+'"]'), B=g.querySelector('[data-id="'+ab[1]+'"]');
+      if(!A||!B) return;
+      var ai=A.querySelector('.ic').getBoundingClientRect(), bi=B.querySelector('.ic').getBoundingClientRect(), ar=A.getBoundingClientRect();
+      var p=mk('path'), d, x1,y1,x2,y2;
+      if(soft||vert){
+        x1=ai.left+ai.width/2-R.left; y1=ar.bottom-R.top+3; x2=bi.left+bi.width/2-R.left; y2=bi.top-R.top-(soft?2:3);
+        var dy=Math.max(14,(y2-y1)/2);
+        d='M'+x1+' '+y1+' C'+x1+' '+(y1+dy)+','+x2+' '+(y2-dy)+','+x2+' '+y2;
+      } else {
+        x1=ai.right-R.left; y1=ai.top+ai.height/2-R.top; x2=bi.left-R.left-3; y2=bi.top+bi.height/2-R.top;
+        var dx=Math.max(24,(x2-x1)/2);
+        d='M'+x1+' '+y1+' C'+(x1+dx)+' '+y1+','+(x2-dx)+' '+y2+','+x2+' '+y2;
+      }
+      if(soft){p.setAttribute('stroke','var(--ai)');p.setAttribute('stroke-dasharray','5 4');}
+      else {p.setAttribute('stroke','var(--muted)');p.setAttribute('marker-end','url(#'+mid+')');}
+      p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke-width','2');
+      svg.appendChild(p);
+      if(label){
+        var L=p.getTotalLength(), pt=p.getPointAtLength(L*(vert?0.72:0.55));
+        var col=label==='true'?'var(--good)':label==='false'?'var(--bad)':'var(--ink2)';
+        var bg=label==='true'?'var(--good-bg)':label==='false'?'var(--bad-bg)':'var(--soft)';
+        var t=mk('text');
+        t.setAttribute('x',pt.x);t.setAttribute('y',pt.y+4);t.setAttribute('text-anchor','middle');
+        t.setAttribute('font-size','12');t.setAttribute('font-weight','600');t.setAttribute('fill',col);t.textContent=label;
+        svg.appendChild(t);
+        var bb=t.getBBox(), r=mk('rect');
+        r.setAttribute('x',bb.x-8);r.setAttribute('y',bb.y-3);r.setAttribute('width',bb.width+16);r.setAttribute('height',bb.height+6);
+        r.setAttribute('rx',(bb.height+6)/2);r.setAttribute('fill',bg);
+        svg.insertBefore(r,t);
+      }
+    });
+  });
+}
+
+/* numbering + checkboxes + progress */
+var KEY='n8n-course-progress-v2', state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){state={};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function setup(){
+  document.querySelectorAll('.session').forEach(function(sec,si){
+    var sn=si+1;
+    sec.querySelectorAll('.topic').forEach(function(tp,ti){
+      var h=tp.querySelector('h3'); if(!h||h.dataset.ready) return;
+      h.dataset.ready='1';
+      var num=sn+'.'+(ti+1), id=tp.id||('t'+num);
+      var inner=h.innerHTML;
+      h.innerHTML='<span class="tn">'+num+'</span><span class="tt">'+inner+'</span>';
+      var lab=document.createElement('label'); lab.className='check';
+      lab.innerHTML='<input type="checkbox" aria-label="Mark topic '+num+' as done"><span class="cl">Done</span>';
+      var cb=lab.querySelector('input'); cb.checked=!!state[id];
+      tp.classList.toggle('done',cb.checked);
+      cb.addEventListener('change',function(){state[id]=cb.checked; if(!cb.checked) delete state[id]; tp.classList.toggle('done',cb.checked); save(); update();});
+      h.appendChild(lab);
+    });
+  });
+  document.querySelectorAll('details.ov').forEach(function(d){
+    var sec=document.getElementById(d.dataset.s); if(!sec) return;
+    var tops=[].slice.call(sec.querySelectorAll('.topic')), sn=d.dataset.s.slice(1);
+    var links=[].slice.call(d.querySelectorAll('a'));
+    links.forEach(function(a,i){
+      var start=tops.indexOf(document.querySelector(a.getAttribute('href')));
+      var nx=links[i+1]?tops.indexOf(document.querySelector(links[i+1].getAttribute('href'))):tops.length;
+      if(start<0) return;
+      var end=nx-1, lab=sn+'.'+(start+1)+(end>start?'–'+sn+'.'+(end+1):'');
+      var sp=document.createElement('span'); sp.className='rng'; sp.textContent=lab;
+      a.insertBefore(sp,a.firstChild);
+    });
+  });
+  update();
+}
+function update(){
+  var all=0,done=0;
+  document.querySelectorAll('.session').forEach(function(sec){
+    var tops=sec.querySelectorAll('.topic'), d=0;
+    tops.forEach(function(t){ if(t.classList.contains('done')) d++; });
+    all+=tops.length; done+=d;
+    var pct=tops.length?Math.round(d/tops.length*100):0;
+    var sp=sec.querySelector('.prog');
+    if(sp){sp.querySelector('.bar i').style.width=pct+'%';sp.querySelector('.txt').textContent=d+' of '+tops.length+' topics done';}
+    var ov=document.querySelector('details.ov[data-s="'+sec.id+'"]');
+    if(ov){ov.querySelector('.mini .bar i').style.width=pct+'%';ov.querySelector('.mini .c').textContent=d+'/'+tops.length;ov.classList.toggle('complete',d===tops.length&&d>0);}
+  });
+  var pct=all?Math.round(done/all*100):0;
+  document.querySelectorAll('[data-overall]').forEach(function(el){el.style.width=pct+'%';});
+  document.querySelectorAll('[data-overall-txt]').forEach(function(el){el.textContent=done+' of '+all+' topics done ('+pct+'%)';});
+  var nc=document.querySelector('.nav .count'); if(nc) nc.textContent=pct+'% done';
+}
+document.addEventListener('DOMContentLoaded',function(){
+  setup(); draw();
+  var r=document.getElementById('resetProgress');
+  if(r) r.addEventListener('click',function(){
+    if(!confirm('Clear all ticked topics?')) return;
+    state={}; save();
+    document.querySelectorAll('.topic').forEach(function(t){t.classList.remove('done');var c=t.querySelector('.check input');if(c)c.checked=false;});
+    update();
+  });
+  document.querySelectorAll('details.ov').forEach(function(d){d.addEventListener('toggle',draw);});
+});
+window.addEventListener('load',draw);
+window.addEventListener('resize',draw);
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(draw);}
+})();
+</script>
+</body>
+</html>
